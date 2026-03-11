@@ -1,180 +1,105 @@
 import { useState } from "react";
-import { Card, Badge, Button, Form, InputGroup } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import styles from "./FoodCard.module.css";
 
 export default function FoodCard({
   food,
-  onDelete,
-  isFavorite = false,
+  isFavorite,
   onToggleFavorite,
+  onEdit,
+  onDelete,
+  userRole,
+  userId,
+  onClick,
 }) {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const [showCalc, setShowCalc] = useState(false);
   const [grams, setGrams] = useState(100);
 
-  const [favorite, setFavorite] = useState(isFavorite);
-  const [togglingFavorite, setTogglingFavorite] = useState(false);
-
-  const handleImageClick = () => navigate(`/foods/detail/${food.id}`);
-
-  const canModify = user?.role === "admin" || food.created_by === user?.id;
-  const calculatedCarbs =
-    Math.round(((food.carbs_per_100g * grams) / 100) * 10) / 10;
-
-  const handleGramsChange = (e) => {
-    const value = Number(e.target.value);
-    if (value >= 0 && value <= 10000) setGrams(value);
-  };
-
-  const handleToggleFavorite = async () => {
-    if (togglingFavorite) return;
-    setTogglingFavorite(true);
-
-    setFavorite(!favorite);
-
-    try {
-      await onToggleFavorite(food.id, !favorite);
-    } catch {
-      setFavorite(favorite);
-    } finally {
-      setTogglingFavorite(false);
-    }
-  };
+  const calcCarbs = Math.round(((food.carbs_per_100g * grams) / 100) * 10) / 10;
+  const isOwner = food.created_by === userId;
+  const canEdit = userRole === "admin" || isOwner;
 
   return (
-    <Card className="h-100 shadow-sm">
-      <div
-        className="position-relative"
-        style={{ cursor: "pointer" }}
-        onClick={handleImageClick}
-        title={`Ver detalle de ${food.name}`}
-      >
-        {food.image_url ? (
-          <Card.Img
-            variant="top"
-            src={food.image_url}
-            alt={food.name}
-            style={{ height: "180px", objectFit: "cover" }}
-          />
-        ) : (
-          <div
-            className="bg-light d-flex align-items-center justify-content-center"
-            style={{ height: "180px", fontSize: "3rem" }}
+    <div className={styles.card} onClick={onClick}>
+      {food.image_url ? (
+        <img src={food.image_url} alt={food.name} className={styles.cardImg} />
+      ) : (
+        <div className={styles.cardImgPlaceholder}>🥗</div>
+      )}
+
+      {food.is_global && <span className={styles.globalBadge}>🌐 Global</span>}
+
+      <div className={styles.cardBody}>
+        <div className={styles.cardName}>{food.name}</div>
+        <span className={styles.carbsBadge}>
+          🌾 {food.carbs_per_100g}g carbs / 100g
+        </span>
+
+        <div onClick={(e) => e.stopPropagation()}>
+          <button
+            className={styles.calcToggle}
+            onClick={() => setShowCalc(!showCalc)}
           >
-            🍽️
-          </div>
-        )}
+            🧮 Calculadora {showCalc ? "▲" : "▼"}
+          </button>
 
-        <div
-          className="position-absolute bottom-0 start-0 end-0 text-center pb-1"
-          style={{
-            background: "rgba(0,0,0,0.35)",
-            color: "white",
-            fontSize: "0.75rem",
-          }}
-        >
-          Ver detalle →
-        </div>
-
-        {onToggleFavorite && (
-          <Button
-            variant={favorite ? "warning" : "outline-warning"}
-            size="sm"
-            className="position-absolute top-0 end-0 m-2 rounded-circle"
-            style={{ width: "36px", height: "36px", padding: 0, zIndex: 1 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleFavorite();
-            }}
-            disabled={togglingFavorite}
-          >
-            {favorite ? "⭐" : "☆"}
-          </Button>
-        )}
-      </div>
-
-      <Card.Body className="d-flex flex-column">
-        <Card.Title>{food.name}</Card.Title>
-
-        <div className="mb-2">
-          <Badge bg="success" className="fs-6">
-            {food.carbs_per_100g}g carbs / 100g
-          </Badge>
-        </div>
-
-        <div className="mt-2 mb-2">
-          {!calculatorOpen ? (
-            <Button
-              variant="outline-success"
-              size="sm"
-              className="w-100"
-              onClick={() => setCalculatorOpen(true)}
-            >
-              🧮 Calcular porción
-            </Button>
-          ) : (
-            <div className="border rounded p-2 bg-light">
-              <small className="text-muted d-block mb-1 fw-bold">
-                Calculá tu porción:
-              </small>
-              <InputGroup size="sm" className="mb-2">
-                <Form.Control
+          {showCalc && (
+            <div className={styles.calcBox}>
+              <div className="d-flex align-items-center gap-2">
+                <input
                   type="number"
                   value={grams}
-                  onChange={handleGramsChange}
-                  min="0"
-                  max="10000"
+                  min="1"
+                  max="9999"
+                  className={styles.calcInput}
+                  onChange={(e) =>
+                    setGrams(Math.max(1, Number(e.target.value)))
+                  }
                   onFocus={(e) => e.target.select()}
                 />
-                <InputGroup.Text>g</InputGroup.Text>
-              </InputGroup>
-              <div className="d-flex justify-content-between align-items-center">
-                <small className="text-muted">Carbohidratos:</small>
-                <Badge
-                  bg={calculatedCarbs > 50 ? "danger" : "success"}
-                  className="fs-6"
-                >
-                  {calculatedCarbs}g
-                </Badge>
+                <span className={`${styles.calcResultLabel} fw-semibold`}>
+                  gramos
+                </span>
               </div>
-              <Button
-                variant="link"
-                size="sm"
-                className="p-0 mt-1 text-muted"
-                onClick={() => {
-                  setCalculatorOpen(false);
-                  setGrams(100);
-                }}
-              >
-                ✕ Cerrar
-              </Button>
+              <div className={styles.calcResult}>
+                <span className={styles.calcResultLabel}>Carbohidratos</span>
+                <span
+                  className={`${styles.calcResultValue} ${calcCarbs > 50 ? styles.calcResultRed : styles.calcResultGreen}`}
+                >
+                  {calcCarbs}g
+                </span>
+              </div>
             </div>
           )}
         </div>
 
-        {canModify && (
-          <div className="mt-auto d-flex gap-2">
-            <Button
-              variant="outline-primary"
-              size="sm"
-              onClick={() => navigate(`/foods/edit/${food.id}`)}
-              className="flex-grow-1"
-            >
-              ✏️ Editar
-            </Button>
-            <Button
-              variant="outline-danger"
-              size="sm"
-              onClick={() => onDelete(food.id)}
-              className="flex-grow-1"
-            >
-              🗑️ Eliminar
-            </Button>
+        <div className={styles.cardFooter} onClick={(e) => e.stopPropagation()}>
+          <div className="d-flex gap-2">
+            {canEdit && (
+              <>
+                <button className={styles.btnEdit} onClick={() => onEdit(food)}>
+                  ✏️
+                </button>
+                <button
+                  className={styles.btnDelete}
+                  onClick={() => onDelete(food)}
+                >
+                  🗑️
+                </button>
+              </>
+            )}
           </div>
-        )}
-      </Card.Body>
-    </Card>
+
+          {onToggleFavorite && (
+            <button
+              className={styles.favBtn}
+              onClick={() => onToggleFavorite(food.id, isFavorite)}
+              title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+            >
+              {isFavorite ? "⭐" : "☆"}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

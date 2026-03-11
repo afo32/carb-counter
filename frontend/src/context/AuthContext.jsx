@@ -79,14 +79,22 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await authService.logout();
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
+    try {
+      await authService.logout();
+    } catch {
+      // Si falla el logout en el servidor, igual limpiamos el estado local
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setUser(null);
+      window.location.href = "/";
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, register, logout, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

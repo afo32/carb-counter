@@ -1,0 +1,242 @@
+.navbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e8f0e9;
+  padding: 0 1.5rem;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  font-family: "Nunito", "Poppins", sans-serif;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.logo span {
+  color: #198754;
+}
+
+.logo:hover {
+  color: #1a1a1a;
+  text-decoration: none;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navLink {
+  text-decoration: none;
+  color: #444;
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 40px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  color: #198754;
+  background: #f0faf4;
+  text-decoration: none;
+}
+
+.navLinkActive {
+  color: #198754;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btnLogin {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 40px;
+  border: 2px solid #198754;
+  background: transparent;
+  color: #198754;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btnLogin:hover {
+  background: #f0faf4;
+}
+
+.btnRegister {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 40px;
+  border: none;
+  background: #198754;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btnRegister:hover {
+  background: #146c43;
+}
+
+.dropdownWrap {
+  position: relative;
+}
+
+.dropdownTrigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f0faf4;
+  border: 1.5px solid #d1e7dd;
+  border-radius: 40px;
+  padding: 0.4rem 1rem 0.4rem 0.6rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #1a1a1a;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.dropdownTrigger:hover {
+  border-color: #198754;
+  background: #e6f4ee;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #198754, #20c997);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.adminBadge {
+  background: #fff3cd;
+  color: #856404;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.45rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.chevron {
+  font-size: 0.65rem;
+  color: #6c757d;
+  transition: transform 0.2s;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e8f0e9;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  min-width: 200px;
+  overflow: hidden;
+  animation: dropIn 0.18s ease;
+  z-index: 200;
+}
+
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.1rem;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #333;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+}
+
+.dropdownItem:hover {
+  background: #f0faf4;
+  color: #198754;
+  text-decoration: none;
+}
+
+.dropdownDivider {
+  height: 1px;
+  background: #e8f0e9;
+  margin: 0.25rem 0;
+}
+
+.dropdownItemDanger {
+  color: #dc3545;
+}
+
+.dropdownItemDanger:hover {
+  background: #fff5f5;
+  color: #dc3545;
+}

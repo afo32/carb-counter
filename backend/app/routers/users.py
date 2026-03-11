@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from app.middleware.auth import get_current_user
 from app.database import supabase
+from pydantic import BaseModel
+from typing import Optional
 
 router = APIRouter(prefix="/users", tags=["Usuarios"])
 
@@ -71,3 +73,42 @@ async def get_my_foods(user=Depends(get_current_user)):
         .execute()
 
     return result.data
+
+class ProfileUpdate(BaseModel):
+    username: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    country: Optional[str] = None
+
+@router.put("/profile")
+async def update_profile(profile_data: ProfileUpdate, user=Depends(get_current_user)):
+    update_data = profile_data.model_dump(exclude_none=True)
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No hay datos para actualizar")
+
+    supabase.table("profiles")\
+        .update(update_data)\
+        .eq("id", user["user_id"])\
+        .execute()
+
+    result = supabase.table("profiles")\
+        .select("username, first_name, last_name, country, role")\
+        .eq("id", user["user_id"])\
+        .limit(1)\
+        .execute()
+
+    return result.data[0]
+
+@router.get("/profile")
+async def get_profile(user=Depends(get_current_user)):
+    result = supabase.table("profiles")\
+        .select("username, first_name, last_name, country, role, created_at")\
+        .eq("id", user["user_id"])\
+        .limit(1)\
+        .execute()
+
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Perfil no encontrado")
+
+    return result.data[0]

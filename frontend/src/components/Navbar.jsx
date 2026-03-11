@@ -1,73 +1,132 @@
-import { Link, useNavigate } from "react-router-dom";
-import { Navbar, Container, Nav, Button } from "react-bootstrap";
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import styles from "./Navbar.module.css";
 
 export default function AppNavbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
+    setOpen(false);
     await logout();
-    navigate("/login");
   };
 
+  const initial = user?.username?.[0]?.toUpperCase() || "?";
+
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <Navbar bg="success" variant="dark" expand="lg" className="mb-4">
-      <Container>
-        <Navbar.Brand as={Link} to="/">
-          🥗 CarbCounter
-        </Navbar.Brand>
-        <Navbar.Toggle />
-        <Navbar.Collapse>
-          <Nav className="me-auto">
-            {user && user.role !== "admin" && (
-              <Nav.Link as={Link} to="/dashboard">
-                🏠 Mi Panel
-              </Nav.Link>
-            )}
-            {user && (
-              <Nav.Link as={Link} to="/foods">
-                🥗 Alimentos
-              </Nav.Link>
-            )}
-            {user?.role === "admin" && (
-              <Nav.Link as={Link} to="/admin/dashboard">
-                🛡️ Panel Admin
-              </Nav.Link>
-            )}
-            {user?.role === "admin" && (
-              <Nav.Link as={Link} to="/admin/users">
-                👥 Usuarios
-              </Nav.Link>
-            )}
-          </Nav>
-          <Nav>
-            {user ? (
-              <>
-                <Navbar.Text className="me-3">
-                  Hola, <strong>{user.username}</strong>
-                </Navbar.Text>
-                <Button
-                  variant="outline-light"
-                  size="sm"
-                  onClick={handleLogout}
+    <nav className={styles.navbar}>
+      <div className={styles.inner}>
+        <Link to="/" className={styles.logo}>
+          🌿 Carb<span>Counter</span>
+        </Link>
+
+        <ul className={styles.navLinks}>
+          {user?.role === "admin" && (
+            <>
+              <li>
+                <Link
+                  to="/admin/dashboard"
+                  className={`${styles.navLink} ${isActive("/admin/dashboard") ? styles.navLinkActive : ""}`}
                 >
-                  Cerrar sesión
-                </Button>
-              </>
-            ) : (
-              <>
-                <Nav.Link as={Link} to="/login">
-                  Iniciar sesión
-                </Nav.Link>
-                <Nav.Link as={Link} to="/register">
-                  Registrarse
-                </Nav.Link>
-              </>
-            )}
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+                  Panel Admin
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/admin/users"
+                  className={`${styles.navLink} ${isActive("/admin/users") ? styles.navLinkActive : ""}`}
+                >
+                  Usuarios
+                </Link>
+              </li>
+            </>
+          )}
+        </ul>
+
+        <div className={styles.navRight}>
+          {user ? (
+            <div className={styles.dropdownWrap} ref={dropdownRef}>
+              <button
+                className={styles.dropdownTrigger}
+                onClick={() => setOpen(!open)}
+              >
+                <div className={styles.avatar}>{initial}</div>
+                {user.username}
+                {user.role === "admin" && (
+                  <span className={styles.adminBadge}>Admin</span>
+                )}
+                <span
+                  className={`${styles.chevron} ${open ? styles.chevronOpen : ""}`}
+                >
+                  ▼
+                </span>
+              </button>
+
+              {open && (
+                <div className={styles.dropdownMenu}>
+                  <Link to="/profile" className={styles.dropdownItem}>
+                    👤 Mi Perfil
+                  </Link>
+
+                  {user.role !== "admin" && (
+                    <Link to="/dashboard" className={styles.dropdownItem}>
+                      🏠 Mi Panel
+                    </Link>
+                  )}
+
+                  <Link to="/" className={styles.dropdownItem}>
+                    🥗 Alimentos
+                  </Link>
+
+                  <div className={styles.dropdownDivider} />
+
+                  <button
+                    className={`${styles.dropdownItem} ${styles.dropdownItemDanger}`}
+                    onClick={handleLogout}
+                  >
+                    🚪 Cerrar sesión
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <button
+                className={styles.btnLogin}
+                onClick={() => navigate("/login")}
+              >
+                Iniciar sesión
+              </button>
+              <button
+                className={styles.btnRegister}
+                onClick={() => navigate("/register")}
+              >
+                Registrarse
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 }

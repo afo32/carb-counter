@@ -1,0 +1,208 @@
+.page {
+  font-family: "Nunito", "Poppins", sans-serif;
+  background: #fdf8f0;
+  min-height: 100vh;
+}
+
+.hero {
+  background: linear-gradient(135deg, #146c43 0%, #198754 60%, #20c997 100%);
+  padding: 4rem 1.5rem 5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 40%
+    );
+  pointer-events: none;
+}
+
+.heroInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.heroEyebrow {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.heroSubtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 2rem;
+}
+
+.searchWrap {
+  background: #ffffff;
+  border-radius: 50px;
+  padding: 0.4rem 0.4rem 0.4rem 1.5rem;
+  display: flex;
+  align-items: center;
+  max-width: 560px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 1rem;
+  font-family: inherit;
+  background: transparent;
+  color: #1a1a1a;
+}
+
+.searchBtn {
+  background: #198754;
+  border: none;
+  border-radius: 40px;
+  color: #ffffff;
+  padding: 0.6rem 1.4rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.searchBtn:hover {
+  background: #146c43;
+}
+
+.statsBar {
+  background: #ffffff;
+  border-bottom: 1px solid #d1e7dd;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.statsBadge {
+  background: #d1e7dd;
+  color: #146c43;
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.searchBadge {
+  background: #fff3cd;
+  color: #856404;
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.clearSearch {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 900;
+  color: #856404;
+  line-height: 1;
+  padding: 0;
+}
+
+.btnPill {
+  border-radius: 40px;
+  font-weight: 700;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.btnGreen {
+  background: #198754;
+  color: #ffffff;
+  border: none;
+}
+
+.btnGreen:hover {
+  background: #146c43;
+}
+
+.btnOutline {
+  background: transparent;
+  color: #198754;
+  border: 2px solid #198754;
+}
+
+.btnOutline:hover {
+  background: #198754;
+  color: #ffffff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 5rem 2rem;
+  color: #6c757d;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.emptyTitle {
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}

@@ -55,9 +55,10 @@ export const adminService = {
   getAllUsers: () => api.get("/admin/users"),
   updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
-  createUser: (data) => api.post("/admin/users", data), // ← nuevo
+  createUser: (data) => api.post("/admin/users", data),
   getRecentUsers: () => api.get("/admin/stats/recent-users"),
   getRecentFoods: () => api.get("/admin/stats/recent-foods"),
+  getUsersByCountry: () => api.get("/admin/stats/users-by-country"),
 };
 
 export const usersService = {
@@ -66,6 +67,8 @@ export const usersService = {
   getFavorites: () => api.get("/users/favorites"),
   addFavorite: (foodId) => api.post(`/users/favorites/${foodId}`),
   removeFavorite: (foodId) => api.delete(`/users/favorites/${foodId}`),
+  getProfile: () => api.get("/users/profile"),
+  updateProfile: (data) => api.put("/users/profile", data),
 };
 
 export const diaryService = {

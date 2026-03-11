@@ -1,0 +1,496 @@
+.page {
+  font-family: "Nunito", "Poppins", sans-serif;
+  background: #ffffff;
+  min-height: 100vh;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6c757d;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0;
+  margin-bottom: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.2s;
+}
+
+.backBtn:hover {
+  color: #198754;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.imageCol {
+  position: sticky;
+  top: 90px;
+}
+
+.imageWrap {
+  border-radius: 20px;
+  overflow: hidden;
+  background: #f8faf8;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imagePlaceholder {
+  font-size: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #d1e7dd, #e8f5e9);
+}
+
+.infoCol {
+  padding-top: 0.5rem;
+}
+
+.foodName {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 900;
+  color: #1a1a1a;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.globalBadge {
+  display: inline-block;
+  background: #d1e7dd;
+  color: #146c43;
+  border-radius: 20px;
+  padding: 0.25rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.carbsBlock {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e8f0e9;
+}
+
+.carbsNumber {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #198754;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.carbsUnit {
+  font-size: 1rem;
+  color: #6c757d;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+
+.calcBlock {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e8f0e9;
+}
+
+.calcLabel {
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #6c757d;
+  margin-bottom: 0.8rem;
+}
+
+.calcRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.calcInputWrap {
+  display: flex;
+  align-items: center;
+  border: 2px solid #d1e7dd;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.calcStepper {
+  background: none;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #198754;
+  font-weight: 700;
+  transition: background 0.15s;
+  line-height: 1;
+}
+
+.calcStepper:hover {
+  background: #f0faf4;
+}
+
+.calcInput {
+  width: 70px;
+  border: none;
+  outline: none;
+  text-align: center;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #1a1a1a;
+  background: transparent;
+}
+
+.calcUnit {
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 0.92rem;
+}
+
+.calcResultRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8faf8;
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  border: 1px solid #e8f0e9;
+}
+
+.calcResultLabel {
+  font-weight: 700;
+  color: #6c757d;
+  font-size: 0.88rem;
+}
+
+.calcResultValue {
+  font-weight: 900;
+  font-size: 1.4rem;
+}
+
+.calcResultGreen {
+  color: #198754;
+}
+.calcResultRed {
+  color: #dc3545;
+}
+
+.actionsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.btnPrimary {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.85rem 2rem;
+  border-radius: 12px;
+  border: none;
+  background: #198754;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btnPrimary:hover {
+  background: #146c43;
+}
+
+.btnSecondary {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.85rem 2rem;
+  border-radius: 12px;
+  border: 2px solid #d1e7dd;
+  background: transparent;
+  color: #198754;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btnSecondary:hover {
+  border-color: #198754;
+  background: #f0faf4;
+}
+
+.btnFavActive {
+  border-color: #ffc107;
+  color: #856404;
+}
+
+.btnFavActive:hover {
+  background: #fffbf0;
+  border-color: #ffc107;
+}
+
+.btnOutlineLogin {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.85rem 2rem;
+  border-radius: 12px;
+  border: 2px solid #198754;
+  background: transparent;
+  color: #198754;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnOutlineLogin:hover {
+  background: #198754;
+  color: #fff;
+}
+
+.metaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metaRow {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.metaKey {
+  font-weight: 800;
+  color: #1a1a1a;
+  min-width: 100px;
+}
+
+.metaVal {
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.adminActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e8f0e9;
+}
+
+.btnEdit {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 40px;
+  border: 2px solid #198754;
+  background: transparent;
+  color: #198754;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnEdit:hover {
+  background: #198754;
+  color: #fff;
+}
+
+.btnDelete {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 40px;
+  border: 2px solid #f5c6cb;
+  background: #fff0f0;
+  color: #dc3545;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnDelete:hover {
+  background: #dc3545;
+  color: #fff;
+  border-color: #dc3545;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modalTitle {
+  font-weight: 900;
+  font-size: 1.3rem;
+  color: #1a1a1a;
+  margin-bottom: 0.4rem;
+}
+
+.modalSubtitle {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.modalFooter {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.btnCancel {
+  flex: 1;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 2px solid #e8f0e9;
+  background: transparent;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnCancel:hover {
+  border-color: #adb5bd;
+}
+
+.btnConfirm {
+  flex: 2;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: none;
+  background: #198754;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnConfirm:hover {
+  background: #146c43;
+}
+
+.btnConfirm:disabled,
+.btnCancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.successAlert {
+  background: #d1e7dd;
+  color: #146c43;
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.errorAlert {
+  background: #f8d7da;
+  color: #842029;
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: #6c757d;
+  font-weight: 700;
+}

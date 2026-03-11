@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from typing import List, Optional
 from app.models.schemas import FoodCreate, FoodUpdate, FoodResponse
-from app.middleware.auth import get_current_user, require_admin
+from app.middleware.auth import get_current_user, require_admin, get_optional_user
 from app.database import supabase
 import uuid
 import httpx
@@ -11,14 +11,16 @@ router = APIRouter(prefix="/foods", tags=["Alimentos"])
 @router.get("/", response_model=List[FoodResponse])
 async def get_foods(
     search: Optional[str] = None,
-    user=Depends(get_current_user)
+    user=Depends(get_optional_user)
 ):
     query = supabase.table("foods").select("*")
     
     if search:
         query = query.ilike("name", f"%{search}%")
     
-    if user["role"] == "admin":
+    if user is None:
+        result = query.eq("is_global", True).order("name").execute()
+    elif user["role"] == "admin":
         result = query.order("name").execute()
     else:
         result = query.or_(
@@ -125,7 +127,7 @@ async def upload_image(
 #     return {"results": results, "query": query, "count": len(results)}
 
 @router.get("/{food_id}", response_model=FoodResponse)
-async def get_food(food_id: str, user=Depends(get_current_user)):
+async def get_food(food_id: str, user=Depends(get_optional_user)):
     result = supabase.table("foods")\
         .select("*")\
         .eq("id", food_id)\
@@ -137,12 +139,14 @@ async def get_food(food_id: str, user=Depends(get_current_user)):
     
     food = result.data[0]
     
-    if user["role"] != "admin":
+    if user is None:
+        if not food["is_global"]:
+            raise HTTPException(status_code=403, detail="Sin acceso")
+    elif user["role"] != "admin":
         if not food["is_global"] and food["created_by"] != user["user_id"]:
             raise HTTPException(status_code=403, detail="Sin acceso")
     
     return food
-
 
 @router.put("/{food_id}", response_model=FoodResponse)
 async def update_food(

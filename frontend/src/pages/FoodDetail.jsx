@@ -1,41 +1,49 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Container,
-  Card,
-  Button,
-  Badge,
-  Spinner,
-  Alert,
-  Form,
-  InputGroup,
-  Modal,
-} from "react-bootstrap";
+import { useAuth } from "../context/AuthContext";
 import { foodsService, diaryService, usersService } from "../services/api";
+import styles from "./FoodDetail.module.css";
 
 export default function FoodDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [food, setFood] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const [showConsumeModal, setShowConsumeModal] = useState(false);
-  const [grams, setGrams] = useState(100);
-  const [consuming, setConsuming] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const [grams, setGrams] = useState(100);
+
+  const [showModal, setShowModal] = useState(false);
+  const [consuming, setConsuming] = useState(false);
+
+  const calcCarbs = food
+    ? Math.round(((food.carbs_per_100g * grams) / 100) * 10) / 10
+    : 0;
+
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+    return () => document.head.removeChild(link);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [foodRes, favoritesRes] = await Promise.all([
-          foodsService.getById(id),
-          usersService.getFavorites(),
-        ]);
+        const foodRes = await foodsService.getById(id);
         setFood(foodRes.data);
-        setIsFavorite(favoritesRes.data.some((f) => f.id === id));
+
+        const token = localStorage.getItem("token");
+        if (token) {
+          const favRes = await usersService.getFavorites();
+          setIsFavorite(favRes.data.some((f) => f.id === id));
+        }
       } catch {
         setError("No se pudo cargar el alimento.");
       } finally {
@@ -45,6 +53,19 @@ export default function FoodDetail() {
     load();
   }, [id]);
 
+  const handleToggleFavorite = async () => {
+    try {
+      if (isFavorite) {
+        await usersService.removeFavorite(id);
+      } else {
+        await usersService.addFavorite(id);
+      }
+      setIsFavorite(!isFavorite);
+    } catch {
+      /* silencioso */
+    }
+  };
+
   const handleConsume = async () => {
     setConsuming(true);
     try {
@@ -52,7 +73,7 @@ export default function FoodDetail() {
         food_id: id,
         consumed_grams: grams,
       });
-      setShowConsumeModal(false);
+      setShowModal(false);
       setSuccessMessage(res.data.message);
       setTimeout(() => setSuccessMessage(""), 4000);
     } catch (err) {
@@ -62,158 +83,259 @@ export default function FoodDetail() {
     }
   };
 
-  const handleToggleFavorite = async () => {
-    if (isFavorite) {
-      await usersService.removeFavorite(id);
-    } else {
-      await usersService.addFavorite(id);
+  const handleDelete = async () => {
+    if (!window.confirm(`¿Eliminar "${food.name}"?`)) return;
+    try {
+      await foodsService.delete(id);
+      navigate("/");
+    } catch {
+      alert("Error al eliminar");
     }
-    setIsFavorite(!isFavorite);
   };
 
-  const calculatedCarbs = food
-    ? Math.round(((food.carbs_per_100g * grams) / 100) * 10) / 10
-    : 0;
+  const isOwner = user && food && food.created_by === user.id;
+  const canEdit = user?.role === "admin" || isOwner;
+  const hasToken = !!localStorage.getItem("token");
 
   if (loading)
     return (
-      <Container className="text-center py-5">
-        <Spinner animation="border" variant="success" />
-      </Container>
+      <div className={styles.center}>
+        <span style={{ fontSize: "2.5rem" }}>🌿</span>
+        <span>Cargando alimento...</span>
+      </div>
     );
 
-  if (error)
+  if (error && !food)
     return (
-      <Container className="py-5">
-        <Alert variant="danger">{error}</Alert>
-        <Button variant="secondary" onClick={() => navigate(-1)}>
+      <div className={styles.center}>
+        <span style={{ fontSize: "2.5rem" }}>⚠️</span>
+        <span>{error}</span>
+        <button className={styles.backBtn} onClick={() => navigate(-1)}>
           ← Volver
-        </Button>
-      </Container>
+        </button>
+      </div>
     );
 
   return (
-    <Container className="py-4" style={{ maxWidth: "600px" }}>
-      <Button
-        variant="outline-secondary"
-        size="sm"
-        className="mb-3"
-        onClick={() => navigate(-1)}
-      >
-        ← Volver
-      </Button>
+    <div className={styles.page}>
+      <div className={styles.inner}>
+        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+          ← Volver
+        </button>
 
-      {successMessage && (
-        <Alert variant="success" className="mb-3">
-          ✅ {successMessage}
-        </Alert>
-      )}
-
-      <Card className="shadow">
-        {food.image_url ? (
-          <Card.Img
-            variant="top"
-            src={food.image_url}
-            alt={food.name}
-            style={{ maxHeight: "300px", objectFit: "cover" }}
-          />
-        ) : (
-          <div
-            className="bg-light d-flex align-items-center justify-content-center"
-            style={{ height: "200px", fontSize: "5rem" }}
-          >
-            🍽️
-          </div>
+        {successMessage && (
+          <div className={styles.successAlert}>✅ {successMessage}</div>
         )}
+        {error && <div className={styles.errorAlert}>⚠️ {error}</div>}
 
-        <Card.Body>
-          <div className="d-flex justify-content-between align-items-start mb-3">
-            <h2 className="mb-0">{food.name}</h2>
-            <Button
-              variant={isFavorite ? "warning" : "outline-warning"}
-              onClick={handleToggleFavorite}
-              title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-            >
-              {isFavorite ? "⭐ Favorito" : "☆ Favorito"}
-            </Button>
-          </div>
-
-          <div className="mb-4">
-            <h5 className="text-muted">Información nutricional</h5>
-            <div className="d-flex gap-2 flex-wrap">
-              <Badge bg="success" className="fs-6 py-2 px-3">
-                {food.carbs_per_100g}g carbohidratos / 100g
-              </Badge>
+        <div className={styles.layout}>
+          <div className={styles.imageCol}>
+            <div className={styles.imageWrap}>
+              {food.image_url ? (
+                <img
+                  src={food.image_url}
+                  alt={food.name}
+                  className={styles.image}
+                />
+              ) : (
+                <div className={styles.imagePlaceholder}>🍽️</div>
+              )}
             </div>
           </div>
 
-          <Button
-            variant="success"
-            size="lg"
-            className="w-100"
-            onClick={() => setShowConsumeModal(true)}
-          >
-            🍴 Lo consumí hoy
-          </Button>
-        </Card.Body>
-      </Card>
+          <div className={styles.infoCol}>
+            <h1 className={styles.foodName}>{food.name}</h1>
 
-      <Modal
-        show={showConsumeModal}
-        onHide={() => setShowConsumeModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>🍴 Registrar consumo</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p className="text-muted">
-            ¿Cuántos gramos de <strong>{food.name}</strong> consumiste?
-          </p>
+            {food.is_global && (
+              <span className={styles.globalBadge}>🌐 Alimento global</span>
+            )}
 
-          <Form.Group className="mb-3">
-            <Form.Label>Cantidad</Form.Label>
-            <InputGroup>
-              <Form.Control
-                type="number"
-                value={grams}
-                onChange={(e) => setGrams(Math.max(1, Number(e.target.value)))}
-                min="1"
-                max="10000"
-                onFocus={(e) => e.target.select()}
-              />
-              <InputGroup.Text>gramos</InputGroup.Text>
-            </InputGroup>
-          </Form.Group>
+            <div className={styles.carbsBlock}>
+              <div className={styles.carbsNumber}>{food.carbs_per_100g}g</div>
+              <div className={styles.carbsUnit}>
+                carbohidratos por cada 100g
+              </div>
+            </div>
 
-          <div className="bg-light rounded p-3 text-center">
-            <small className="text-muted d-block">
-              Carbohidratos a registrar
-            </small>
-            <span
-              className={`fs-3 fw-bold ${calculatedCarbs > 50 ? "text-danger" : "text-success"}`}
-            >
-              {calculatedCarbs}g
-            </span>
+            <div className={styles.calcBlock}>
+              <div className={styles.calcLabel}>
+                🧮 Calculadora de porciones
+              </div>
+              <div className={styles.calcRow}>
+                <div className={styles.calcInputWrap}>
+                  <button
+                    className={styles.calcStepper}
+                    onClick={() => setGrams((g) => Math.max(1, g - 10))}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    className={styles.calcInput}
+                    value={grams}
+                    min="1"
+                    max="9999"
+                    onChange={(e) =>
+                      setGrams(Math.max(1, Number(e.target.value)))
+                    }
+                    onFocus={(e) => e.target.select()}
+                  />
+                  <button
+                    className={styles.calcStepper}
+                    onClick={() => setGrams((g) => g + 10)}
+                  >
+                    +
+                  </button>
+                </div>
+                <span className={styles.calcUnit}>gramos</span>
+              </div>
+              <div className={styles.calcResultRow}>
+                <span className={styles.calcResultLabel}>
+                  Carbohidratos totales
+                </span>
+                <span
+                  className={`${styles.calcResultValue} ${calcCarbs > 50 ? styles.calcResultRed : styles.calcResultGreen}`}
+                >
+                  {calcCarbs}g
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.actionsBlock}>
+              {hasToken ? (
+                <>
+                  <button
+                    className={styles.btnPrimary}
+                    onClick={() => setShowModal(true)}
+                  >
+                    🍴 Lo consumí hoy ({grams}g)
+                  </button>
+                  <button
+                    className={`${styles.btnSecondary} ${isFavorite ? styles.btnFavActive : ""}`}
+                    onClick={handleToggleFavorite}
+                  >
+                    {isFavorite ? "⭐ En favoritos" : "☆ Agregar a favoritos"}
+                  </button>
+                </>
+              ) : (
+                <button
+                  className={styles.btnOutlineLogin}
+                  onClick={() => navigate("/login")}
+                >
+                  Iniciá sesión para registrar este alimento
+                </button>
+              )}
+            </div>
+
+            <div className={styles.metaBlock}>
+              <div className={styles.metaRow}>
+                <span className={styles.metaKey}>Tipo:</span>
+                <span className={styles.metaVal}>
+                  {food.is_global ? "Alimento global" : "Alimento personal"}
+                </span>
+              </div>
+              <div className={styles.metaRow}>
+                <span className={styles.metaKey}>Agregado:</span>
+                <span className={styles.metaVal}>
+                  {new Date(food.created_at).toLocaleDateString("es-ES", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+            </div>
+
+            {canEdit && (
+              <div className={styles.adminActions}>
+                <button
+                  className={styles.btnEdit}
+                  onClick={() => navigate(`/foods/edit/${id}`)}
+                >
+                  ✏️ Editar
+                </button>
+                <button className={styles.btnDelete} onClick={handleDelete}>
+                  🗑️ Eliminar
+                </button>
+              </div>
+            )}
           </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowConsumeModal(false)}
-            disabled={consuming}
-          >
-            Cancelar
-          </Button>
-          <Button
-            variant="success"
-            onClick={handleConsume}
-            disabled={consuming}
-          >
-            {consuming ? <Spinner size="sm" /> : "Confirmar"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+        </div>
+      </div>
+
+      {showModal && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowModal(false)}
+        >
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalTitle}>🍴 Registrar consumo</div>
+            <div className={styles.modalSubtitle}>
+              Vas a registrar <strong>{grams}g</strong> de{" "}
+              <strong>{food.name}</strong> — eso equivale a{" "}
+              <strong>{calcCarbs}g</strong> de carbohidratos.
+            </div>
+
+            <div
+              className={styles.calcInputWrap}
+              style={{ width: "fit-content", marginBottom: "1rem" }}
+            >
+              <button
+                className={styles.calcStepper}
+                onClick={() => setGrams((g) => Math.max(1, g - 10))}
+                disabled={consuming}
+              >
+                −
+              </button>
+              <input
+                type="number"
+                className={styles.calcInput}
+                value={grams}
+                min="1"
+                max="9999"
+                onChange={(e) => setGrams(Math.max(1, Number(e.target.value)))}
+                onFocus={(e) => e.target.select()}
+                disabled={consuming}
+              />
+              <button
+                className={styles.calcStepper}
+                onClick={() => setGrams((g) => g + 10)}
+                disabled={consuming}
+              >
+                +
+              </button>
+            </div>
+
+            <div className={styles.calcResultRow}>
+              <span className={styles.calcResultLabel}>
+                Carbohidratos a registrar
+              </span>
+              <span
+                className={`${styles.calcResultValue} ${calcCarbs > 50 ? styles.calcResultRed : styles.calcResultGreen}`}
+              >
+                {calcCarbs}g
+              </span>
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.btnCancel}
+                onClick={() => setShowModal(false)}
+                disabled={consuming}
+              >
+                Cancelar
+              </button>
+              <button
+                className={styles.btnConfirm}
+                onClick={handleConsume}
+                disabled={consuming}
+              >
+                {consuming ? "Registrando..." : "Confirmar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

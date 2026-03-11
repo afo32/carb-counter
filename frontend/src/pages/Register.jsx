@@ -36,7 +36,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await register(
+      const userData = await register(
         formData.email,
         formData.password,
         formData.username,
@@ -44,7 +44,11 @@ export default function Register() {
         formData.last_name,
         formData.country,
       );
-      navigate("/foods");
+      if (userData.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.response?.data?.detail || "Error al registrarse");
     } finally {

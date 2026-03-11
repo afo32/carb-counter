@@ -71,16 +71,22 @@ async def login(credentials: UserLogin):
                 .limit(1)\
                 .execute()
 
-            if profile.data:
-                username = profile.data["username"]
-                role = profile.data["role"]
-                first_name = profile.data["first_name"]
-                last_name = profile.data["last_name"]
-                country = profile.data["country"]
-        except Exception:
-            pass
+            print(f"✅ Profile data: {profile.data}")
 
-        return TokenResponse(
+            if profile.data:
+                username = profile.data[0]["username"]
+                role = profile.data[0]["role"]
+                first_name = profile.data[0]["first_name"]
+                last_name = profile.data[0]["last_name"]
+                country = profile.data[0]["country"]
+        except Exception as e:
+            print(f"❌ Error consultando perfil: {str(e)}")
+
+        print(f"🔑 session: {response.session}")
+        print(f"👤 user_id: {response.user.id}")
+        print(f"📋 role: {role}, username: {username}")
+
+        token_response = TokenResponse(
             access_token=response.session.access_token,
             user_id=response.user.id,
             username=username,
@@ -89,11 +95,17 @@ async def login(credentials: UserLogin):
             last_name=last_name,
             country=country
         )
+        print(f"✅ TokenResponse creado correctamente")
+        return token_response
 
     except HTTPException:
         raise
-    except Exception:
-        raise HTTPException(status_code=401, detail="Email o contraseña incorrectos")
+    except Exception as e:
+        print(f"❌ Error REAL en login: {str(e)}")
+        raise HTTPException(
+            status_code=401,
+            detail="Email o contraseña incorrectos"
+        )
 
 @router.post("/logout")
 async def logout():

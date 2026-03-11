@@ -18,8 +18,12 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate("/foods");
+      const userData = await login(email, password);
+      if (userData.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.response?.data?.detail || "Error al iniciar sesión");
     } finally {

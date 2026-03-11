@@ -81,27 +81,28 @@ async def delete_user(user_id: str, admin=Depends(require_admin)):
     supabase.auth.admin.delete_user(user_id)
     
 @router.get("/stats/recent-users")
-async def get_recent_users(admin=Depends(require_admin)):
-
+async def recent_users(admin=Depends(require_admin)):
     three_days_ago = (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
     
     result = supabase.table("profiles")\
-        .select("id", count="exact")\
+        .select("username, role, country, created_at")\
         .gte("created_at", three_days_ago)\
+        .order("created_at", desc=True)\
         .execute()
     
-    return {"count": result.count, "days": 3}
+    return result.data
 
 @router.get("/stats/recent-foods")
-async def get_recent_foods(admin=Depends(require_admin)):
+async def recent_foods(admin=Depends(require_admin)):
     three_days_ago = (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
     
     result = supabase.table("foods")\
-        .select("id", count="exact")\
+        .select("name, carbs_per_100g, created_at")\
         .gte("created_at", three_days_ago)\
+        .order("created_at", desc=True)\
         .execute()
     
-    return {"count": result.count, "days": 3}
+    return result.data
 
 class AdminCreateUser(BaseModel):
     email: EmailStr
@@ -148,3 +149,23 @@ async def create_user(user_data: AdminCreateUser, admin=Depends(require_admin)):
             status_code=400,
             detail=f"Error al crear el usuario: {str(e)}"
         )
+        
+@router.get("/stats/users-by-country")
+async def users_by_country(admin=Depends(require_admin)):
+    result = supabase.table("profiles")\
+        .select("country")\
+        .execute()
+
+    if not result.data:
+        return []
+
+    counts = {}
+    for row in result.data:
+        country = row.get("country") or "Sin especificar"
+        counts[country] = counts.get(country, 0) + 1
+
+    return sorted(
+        [{"country": k, "count": v} for k, v in counts.items()],
+        key=lambda x: x["count"],
+        reverse=True
+    )

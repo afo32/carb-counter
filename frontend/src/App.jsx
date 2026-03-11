@@ -1,29 +1,22 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import AppNavbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminRoute from "./components/AdminRoute";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Foods from "./pages/Foods";
+import EditFood from "./pages/EditFood";
+import FoodDetail from "./pages/FoodDetail";
 import AdminUsers from "./pages/AdminUsers";
 import AdminDashboard from "./pages/AdminDashboard";
-import EditFood from "./pages/EditFood";
 import AdminCreateUser from "./pages/AdminCreateUser";
 import UserDashboard from "./pages/UserDashboard";
 import Favorites from "./pages/Favorites";
 import MyFoods from "./pages/MyFoods";
-import FoodDetail from "./pages/FoodDetail";
 import DiaryCalendar from "./pages/DiaryCalendar";
 import DiaryDay from "./pages/DiaryDay";
-
-function RootRedirect() {
-  const { user, loading } = useAuth();
-  if (loading) return null;
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
-  return <Navigate to="/dashboard" replace />; // ← usuarios van al panel
-}
+import EditProfile from "./pages/EditProfile";
 
 export default function App() {
   return (
@@ -31,18 +24,13 @@ export default function App() {
       <BrowserRouter>
         <AppNavbar />
         <Routes>
+          {/* ── Rutas públicas ── */}
+          <Route path="/" element={<Foods />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/foods/detail/:id" element={<FoodDetail />} />
 
-          <Route
-            path="/foods"
-            element={
-              <PrivateRoute>
-                <Foods />
-              </PrivateRoute>
-            }
-          />
-
+          {/* ── Rutas privadas (requieren login) ── */}
           <Route
             path="/foods/edit/:id"
             element={
@@ -51,7 +39,6 @@ export default function App() {
               </PrivateRoute>
             }
           />
-
           <Route
             path="/dashboard"
             element={
@@ -76,15 +63,6 @@ export default function App() {
               </PrivateRoute>
             }
           />
-
-          <Route
-            path="/foods/detail/:id"
-            element={
-              <PrivateRoute>
-                <FoodDetail />
-              </PrivateRoute>
-            }
-          />
           <Route
             path="/diary"
             element={
@@ -101,7 +79,16 @@ export default function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <EditProfile />
+              </PrivateRoute>
+            }
+          />
 
+          {/* ── Rutas de admin ── */}
           <Route
             path="/admin/dashboard"
             element={
@@ -110,7 +97,6 @@ export default function App() {
               </AdminRoute>
             }
           />
-
           <Route
             path="/admin/users"
             element={
@@ -119,7 +105,6 @@ export default function App() {
               </AdminRoute>
             }
           />
-
           <Route
             path="/admin/users/create"
             element={
@@ -128,8 +113,6 @@ export default function App() {
               </AdminRoute>
             }
           />
-
-          <Route path="/" element={<RootRedirect />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

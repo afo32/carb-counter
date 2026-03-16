@@ -36,7 +36,6 @@
 .logo span {
   color: #198754;
 }
-
 .logo:hover {
   color: #1a1a1a;
   text-decoration: none;
@@ -78,6 +77,27 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.langBtn {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.75rem;
+  border-radius: 40px;
+  border: 1.5px solid #d1e7dd;
+  background: #f0faf4;
+  color: #198754;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.langBtn:hover {
+  background: #198754;
+  color: #fff;
+  border-color: #198754;
 }
 
 .btnLogin {
@@ -235,7 +255,6 @@
 .dropdownItemDanger {
   color: #dc3545;
 }
-
 .dropdownItemDanger:hover {
   background: #fff5f5;
   color: #dc3545;

@@ -1,31 +1,36 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  Container,
-  Card,
-  Button,
-  Badge,
-  Spinner,
-  Alert,
-  Table,
-  Row,
-  Col,
-} from "react-bootstrap";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useAuth } from "../context/AuthContext";
 import { diaryService } from "../services/api";
+import styles from "./UserPages.module.css";
+import day from "./DiaryDay.module.css";
 
 export default function DiaryDay() {
   const { dateStr } = useParams();
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { t } = useTranslation();
+
   const [dayData, setDayData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+    return () => document.head.removeChild(link);
+  }, []);
 
   const load = async () => {
     try {
       const res = await diaryService.getByDate(dateStr);
       setDayData(res.data);
     } catch {
-      setError("No se pudo cargar el diario de este día.");
+      setError(t("diaryDay.errorLoad"));
     } finally {
       setLoading(false);
     }
@@ -36,14 +41,14 @@ export default function DiaryDay() {
   }, [dateStr]);
 
   const handleDelete = async (entryId) => {
-    if (!confirm("¿Eliminar este registro?")) return;
+    if (!window.confirm(t("diaryDay.deleteConfirm"))) return;
     await diaryService.deleteEntry(entryId);
     load();
   };
 
   const formatDate = (str) => {
-    const [year, month, day] = str.split("-").map(Number);
-    return new Date(year, month - 1, day).toLocaleDateString("es-ES", {
+    const [year, month, d] = str.split("-").map(Number);
+    return new Date(year, month - 1, d).toLocaleDateString("es-ES", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -51,145 +56,181 @@ export default function DiaryDay() {
     });
   };
 
+  const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
   if (loading)
     return (
-      <Container className="text-center py-5">
-        <Spinner animation="border" variant="success" />
-      </Container>
+      <div className={styles.center}>
+        <span style={{ fontSize: "1.5rem" }}>📋</span>
+        {t("diaryDay.loading")}
+      </div>
     );
 
   return (
-    <Container style={{ maxWidth: "700px" }}>
-      <div className="d-flex align-items-center mb-4">
-        <Button
-          variant="outline-secondary"
-          size="sm"
-          className="me-3"
-          onClick={() => navigate("/diary")}
-        >
-          ← Volver al calendario
-        </Button>
-        <div>
-          <h1 className="mb-0">📋 {formatDate(dateStr)}</h1>
+    <div className={styles.page}>
+      <div className={styles.banner}>
+        <h1 className={styles.bannerTitle}>{t("diaryDay.bannerTitle")}</h1>
+        <div className={styles.breadcrumb}>
+          <Link to="/">{t("common.home")}</Link>
+          <span>/</span>
+          <Link to="/diary">{t("diaryDay.breadcrumbDiary")}</Link>
+          <span>/</span>
+          <span>{dateStr}</span>
         </div>
       </div>
+      <div className={styles.content}>
+        <nav className={styles.sidebar}>
+          <Link to="/profile" className={styles.sidebarItem}>
+            {t("sidebar.myProfile")}
+          </Link>
+          <Link to="/dashboard" className={styles.sidebarItem}>
+            {t("sidebar.myDashboard")}
+          </Link>
+          <Link to="/favorites" className={styles.sidebarItem}>
+            {t("sidebar.favorites")}
+          </Link>
+          <Link to="/my-foods" className={styles.sidebarItem}>
+            {t("sidebar.myFoods")}
+          </Link>
+          <Link
+            to="/diary"
+            className={`${styles.sidebarItem} ${styles.sidebarItemActive}`}
+          >
+            {t("sidebar.diary")}
+          </Link>
+          <div className={styles.sidebarDivider} />
+          <button
+            className={`${styles.sidebarItem} ${styles.sidebarItemDanger}`}
+            onClick={logout}
+          >
+            {t("sidebar.logout")}
+          </button>
+        </nav>
+        <div className={styles.main}>
+          <div className={styles.mainHeader}>
+            <h2 className={styles.mainTitle}>
+              {capitalize(formatDate(dateStr))}
+            </h2>
+            <button
+              className={styles.btnGreen}
+              onClick={() => navigate("/diary")}
+              style={{ fontSize: "0.82rem", padding: "0.55rem 1.2rem" }}
+            >
+              {t("diaryDay.backBtn")}
+            </button>
+          </div>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+          {error && <div className={day.errorAlert}>⚠️ {error}</div>}
 
-      {dayData && (
-        <>
-          <Row className="g-3 mb-4">
-            <Col xs={6}>
-              <Card className="text-center border-success">
-                <Card.Body className="py-3">
-                  <div className="display-5 fw-bold text-success">
+          {dayData && (
+            <>
+              <div className={day.statsRow}>
+                <div className={`${day.statCard} ${day.statCardGreen}`}>
+                  <div className={`${day.statNumber} ${day.statNumberGreen}`}>
                     {dayData.total_carbs}g
                   </div>
-                  <small className="text-muted">Total carbohidratos</small>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col xs={6}>
-              <Card className="text-center border-primary">
-                <Card.Body className="py-3">
-                  <div className="display-5 fw-bold text-primary">
+                  <div className={day.statLabel}>
+                    {t("diaryDay.totalCarbs")}
+                  </div>
+                </div>
+                <div className={`${day.statCard} ${day.statCardBlue}`}>
+                  <div className={`${day.statNumber} ${day.statNumberBlue}`}>
                     {dayData.entry_count}
                   </div>
-                  <small className="text-muted">
-                    {dayData.entry_count === 1 ? "registro" : "registros"}
-                  </small>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
+                  <div className={day.statLabel}>
+                    {dayData.entry_count === 1
+                      ? t("diaryDay.entry")
+                      : t("diaryDay.entries")}
+                  </div>
+                </div>
+              </div>
 
-          {dayData.entries.length === 0 ? (
-            <Alert variant="info">No hay registros para este día.</Alert>
-          ) : (
-            <Card className="shadow-sm">
-              <Card.Header className="fw-bold">
-                🍴 Alimentos consumidos
-              </Card.Header>
-              <Table responsive className="mb-0">
-                <thead className="table-light">
-                  <tr>
-                    <th>Alimento</th>
-                    <th className="text-center">Cantidad</th>
-                    <th className="text-center">Carbos</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dayData.entries.map((entry) => (
-                    <tr key={entry.id}>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
-                          {entry.foods?.image_url ? (
-                            <img
-                              src={entry.foods.image_url}
-                              alt={entry.foods?.name}
-                              style={{
-                                width: "36px",
-                                height: "36px",
-                                objectFit: "cover",
-                                borderRadius: "4px",
-                              }}
-                            />
-                          ) : (
-                            <span style={{ fontSize: "1.5rem" }}>🍽️</span>
-                          )}
-                          <span
-                            className="text-success"
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              navigate(`/foods/detail/${entry.food_id}`)
-                            }
-                          >
-                            {entry.foods?.name || "Alimento eliminado"}
+              {dayData.entries.length === 0 ? (
+                <div className={day.empty}>
+                  <div className={day.emptyIcon}>🍽️</div>
+                  <p className={day.emptyText}>{t("diaryDay.emptyText")}</p>
+                </div>
+              ) : (
+                <div className={day.tableWrap}>
+                  <div className={day.tableHeader}>
+                    {t("diaryDay.tableTitle")}
+                  </div>
+                  <table className={day.table}>
+                    <thead>
+                      <tr>
+                        <th>{t("diaryDay.colFood")}</th>
+                        <th className={day.center}>
+                          {t("diaryDay.colAmount")}
+                        </th>
+                        <th className={day.center}>{t("diaryDay.colCarbs")}</th>
+                        <th className={day.center}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dayData.entries.map((entry) => (
+                        <tr key={entry.id}>
+                          <td>
+                            <div className={day.foodCell}>
+                              {entry.foods?.image_url ? (
+                                <img
+                                  src={entry.foods.image_url}
+                                  alt={entry.foods?.name}
+                                  className={day.foodImg}
+                                />
+                              ) : (
+                                <div className={day.foodImgPlaceholder}>🍽️</div>
+                              )}
+                              <span
+                                className={day.foodName}
+                                onClick={() =>
+                                  navigate(`/foods/detail/${entry.food_id}`)
+                                }
+                              >
+                                {entry.foods?.name || t("diaryDay.deletedFood")}
+                              </span>
+                            </div>
+                          </td>
+                          <td className={day.center}>
+                            {entry.consumed_grams}g
+                          </td>
+                          <td className={day.center}>
+                            <span
+                              className={`${day.carbsBadge} ${entry.carbs_consumed > 50 ? day.carbsBadgeRed : day.carbsBadgeGreen}`}
+                            >
+                              {entry.carbs_consumed}g
+                            </span>
+                          </td>
+                          <td className={day.center}>
+                            <button
+                              className={day.btnDelete}
+                              onClick={() => handleDelete(entry.id)}
+                            >
+                              🗑️
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot className={day.tableFoot}>
+                      <tr>
+                        <td colSpan={2} className={day.totalLabel}>
+                          {t("diaryDay.totalLabel")}
+                        </td>
+                        <td className={day.totalValue}>
+                          <span className={day.totalBadge}>
+                            {dayData.total_carbs}g
                           </span>
-                        </div>
-                      </td>
-                      <td className="text-center align-middle">
-                        {entry.consumed_grams}g
-                      </td>
-                      <td className="text-center align-middle">
-                        <Badge
-                          bg={entry.carbs_consumed > 50 ? "danger" : "success"}
-                        >
-                          {entry.carbs_consumed}g
-                        </Badge>
-                      </td>
-                      <td className="text-center align-middle">
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => handleDelete(entry.id)}
-                          title="Eliminar este registro"
-                        >
-                          🗑️
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot className="table-success">
-                  <tr>
-                    <td colSpan={2} className="fw-bold text-end">
-                      Total del día:
-                    </td>
-                    <td className="text-center fw-bold">
-                      <Badge bg="success" className="fs-6">
-                        {dayData.total_carbs}g
-                      </Badge>
-                    </td>
-                    <td></td>
-                  </tr>
-                </tfoot>
-              </Table>
-            </Card>
+                        </td>
+                        <td />
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { foodsService, usersService } from "../services/api";
 import FoodCard from "../components/FoodCard";
@@ -10,6 +11,7 @@ import styles from "./Foods.module.css";
 export default function Foods() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [foods, setFoods] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
@@ -45,7 +47,7 @@ export default function Foods() {
         setFoods(Array.isArray(foodsRes.data) ? foodsRes.data : []);
       }
     } catch {
-      setError("Error al cargar los alimentos");
+      setError(t("foods.errorLoad"));
     } finally {
       setLoading(false);
     }
@@ -83,17 +85,15 @@ export default function Foods() {
     setEditingFood(food);
     setShowModal(true);
   };
-
   const handleDelete = async (food) => {
-    if (!window.confirm(`¿Eliminar "${food.name}"?`)) return;
+    if (!window.confirm(t("foods.deleteConfirm", { name: food.name }))) return;
     try {
       await foodsService.delete(food.id);
       setFoods((prev) => prev.filter((f) => f.id !== food.id));
     } catch {
-      alert("Error al eliminar");
+      alert(t("foods.deleteError"));
     }
   };
-
   const handleModalSuccess = () => {
     setShowModal(false);
     setEditingFood(null);
@@ -104,27 +104,29 @@ export default function Foods() {
     <div className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroInner}>
-          <p className={styles.heroEyebrow}>🌱 Alimentación consciente</p>
+          <p className={styles.heroEyebrow}>{t("foods.eyebrow")}</p>
           <h1 className={styles.heroTitle}>
-            Descubre los carbohidratos
-            <br />
-            de lo que comes
+            {t("foods.heroTitle")
+              .split("\n")
+              .map((line, i) => (
+                <span key={i}>
+                  {line}
+                  {i === 0 && <br />}
+                </span>
+              ))}
           </h1>
-          <p className={styles.heroSubtitle}>
-            Base de datos de alimentos con información nutricional al instante.
-          </p>
-
+          <p className={styles.heroSubtitle}>{t("foods.heroSubtitle")}</p>
           <form onSubmit={handleSearch}>
             <div className={styles.searchWrap}>
               <span className="me-2">🔍</span>
               <input
                 className={styles.searchInput}
-                placeholder="Buscar alimento... (ej: arroz, banana)"
+                placeholder={t("foods.searchPlaceholder")}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
               <button type="submit" className={styles.searchBtn}>
-                Buscar
+                {t("foods.searchBtn")}
               </button>
             </div>
           </form>
@@ -134,7 +136,7 @@ export default function Foods() {
       <div className={styles.statsBar}>
         <div className="d-flex align-items-center flex-wrap gap-2">
           <span className={styles.statsBadge}>
-            {loading ? "..." : `${foods.length} alimentos`}
+            {loading ? "..." : t("foods.count", { count: foods.length })}
           </span>
           {search && (
             <span className={styles.searchBadge}>
@@ -151,7 +153,6 @@ export default function Foods() {
             </span>
           )}
         </div>
-
         <div className="d-flex flex-wrap gap-2">
           {user ? (
             <>
@@ -159,7 +160,7 @@ export default function Foods() {
                 className={`${styles.btnPill} ${styles.btnOutline}`}
                 onClick={() => setShowOffSearch(true)}
               >
-                🌍 Open Food Facts
+                {t("foods.addOff")}
               </button>
               <button
                 className={`${styles.btnPill} ${styles.btnGreen}`}
@@ -168,7 +169,7 @@ export default function Foods() {
                   setShowModal(true);
                 }}
               >
-                + Agregar alimento
+                {t("foods.addFood")}
               </button>
             </>
           ) : (
@@ -176,7 +177,7 @@ export default function Foods() {
               className={`${styles.btnPill} ${styles.btnOutline}`}
               onClick={() => navigate("/login")}
             >
-              Iniciá sesión para agregar →
+              {t("foods.loginToAdd")}
             </button>
           )}
         </div>
@@ -192,7 +193,7 @@ export default function Foods() {
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>🌿</div>
           <p className="fw-bold" style={{ color: "#198754" }}>
-            Cargando alimentos...
+            {t("foods.loadingFoods")}
           </p>
         </div>
       ) : foods.length === 0 ? (
@@ -200,20 +201,20 @@ export default function Foods() {
           <div className={styles.emptyIcon}>🍽️</div>
           <p className={styles.emptyTitle}>
             {search
-              ? `Sin resultados para "${search}"`
-              : "No hay alimentos todavía"}
+              ? t("foods.emptySearch", { term: search })
+              : t("foods.emptyTitle")}
           </p>
           <p className="text-muted">
             {search
-              ? "Probá con otro término o buscá en Open Food Facts"
-              : "Sé el primero en agregar un alimento"}
+              ? t("foods.emptySearchSuggestion")
+              : t("foods.emptySuggestion")}
           </p>
           {user && (
             <button
               className={`${styles.btnPill} ${styles.btnGreen} mt-3`}
               onClick={() => setShowModal(true)}
             >
-              + Agregar alimento
+              {t("foods.addFood")}
             </button>
           )}
         </div>

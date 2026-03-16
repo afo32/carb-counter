@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Navbar.module.css";
 
@@ -7,8 +8,15 @@ export default function AppNavbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const currentLang = i18n.language?.startsWith("en") ? "EN" : "ES";
+
+  const toggleLang = () => {
+    i18n.changeLanguage(currentLang === "ES" ? "en" : "es");
+  };
 
   useEffect(() => {
     const handler = (e) => {
@@ -30,7 +38,6 @@ export default function AppNavbar() {
   };
 
   const initial = user?.username?.[0]?.toUpperCase() || "?";
-
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -41,6 +48,14 @@ export default function AppNavbar() {
         </Link>
 
         <ul className={styles.navLinks}>
+          <li>
+            <Link
+              to="/"
+              className={`${styles.navLink} ${isActive("/") ? styles.navLinkActive : ""}`}
+            >
+              {t("navbar.foods")}
+            </Link>
+          </li>
           {user?.role === "admin" && (
             <>
               <li>
@@ -48,7 +63,7 @@ export default function AppNavbar() {
                   to="/admin/dashboard"
                   className={`${styles.navLink} ${isActive("/admin/dashboard") ? styles.navLinkActive : ""}`}
                 >
-                  Panel Admin
+                  {t("navbar.adminPanel")}
                 </Link>
               </li>
               <li>
@@ -56,7 +71,7 @@ export default function AppNavbar() {
                   to="/admin/users"
                   className={`${styles.navLink} ${isActive("/admin/users") ? styles.navLinkActive : ""}`}
                 >
-                  Usuarios
+                  {t("navbar.users")}
                 </Link>
               </li>
             </>
@@ -64,6 +79,16 @@ export default function AppNavbar() {
         </ul>
 
         <div className={styles.navRight}>
+          <button
+            className={styles.langBtn}
+            onClick={toggleLang}
+            title={
+              currentLang === "ES" ? "Switch to English" : "Cambiar a Español"
+            }
+          >
+            {currentLang}
+          </button>
+
           {user ? (
             <div className={styles.dropdownWrap} ref={dropdownRef}>
               <button
@@ -85,26 +110,27 @@ export default function AppNavbar() {
               {open && (
                 <div className={styles.dropdownMenu}>
                   <Link to="/profile" className={styles.dropdownItem}>
-                    👤 Mi Perfil
+                    {t("navbar.myProfile")}
                   </Link>
-
                   {user.role !== "admin" && (
-                    <Link to="/dashboard" className={styles.dropdownItem}>
-                      🏠 Mi Panel
-                    </Link>
+                    <>
+                      <Link to="/dashboard" className={styles.dropdownItem}>
+                        {t("navbar.myDashboard")}
+                      </Link>
+                      <Link to="/favorites" className={styles.dropdownItem}>
+                        {t("navbar.favorites")}
+                      </Link>
+                    </>
                   )}
-
                   <Link to="/" className={styles.dropdownItem}>
-                    🥗 Alimentos
+                    🥗 {t("navbar.foods")}
                   </Link>
-
                   <div className={styles.dropdownDivider} />
-
                   <button
                     className={`${styles.dropdownItem} ${styles.dropdownItemDanger}`}
                     onClick={handleLogout}
                   >
-                    🚪 Cerrar sesión
+                    {t("navbar.logout")}
                   </button>
                 </div>
               )}
@@ -115,13 +141,13 @@ export default function AppNavbar() {
                 className={styles.btnLogin}
                 onClick={() => navigate("/login")}
               >
-                Iniciar sesión
+                {t("navbar.login")}
               </button>
               <button
                 className={styles.btnRegister}
                 onClick={() => navigate("/register")}
               >
-                Registrarse
+                {t("navbar.register")}
               </button>
             </>
           )}

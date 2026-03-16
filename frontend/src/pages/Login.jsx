@@ -1,85 +1,106 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Container, Card, Form, Button, Alert } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
+import styles from "./Auth.module.css";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { t } = useTranslation();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+    return () => document.head.removeChild(link);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const userData = await login(email, password);
-      if (userData.role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/");
-      }
+      navigate(userData.role === "admin" ? "/admin/dashboard" : "/");
     } catch (err) {
-      setError(err.response?.data?.detail || "Error al iniciar sesión");
+      setError(err.response?.data?.detail || t("login.errorDefault"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{ minHeight: "80vh" }}
-    >
-      <Card style={{ width: "100%", maxWidth: "400px" }}>
-        <Card.Body className="p-4">
-          <h2 className="text-center mb-4">Iniciar Sesión</h2>
+    <div className={styles.page}>
+      <div className={styles.banner}>
+        <h1 className={styles.bannerTitle}>{t("login.bannerTitle")}</h1>
+        <div className={styles.breadcrumb}>
+          <Link to="/">{t("common.home")}</Link>
+          <span>/</span>
+          <span>{t("login.breadcrumb")}</span>
+        </div>
+      </div>
 
-          {error && <Alert variant="danger">{error}</Alert>}
+      <div className={styles.content}>
+        <h2 className={styles.sectionTitle}>{t("login.title")}</h2>
 
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="bestcarbcounter@email.com"
-                required
-              />
-            </Form.Group>
+        {error && <div className={styles.errorAlert}>⚠️ {error}</div>}
 
-            <Form.Group className="mb-3">
-              <Form.Label>Contraseña</Form.Label>
-              <Form.Control
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="******"
-                required
-              />
-            </Form.Group>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              {t("login.email")}{" "}
+              <span className={styles.required}>{t("common.required")}</span>
+            </label>
+            <input
+              type="email"
+              className={styles.input}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
+          </div>
 
-            <Button
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              {t("login.password")}{" "}
+              <span className={styles.required}>{t("common.required")}</span>
+            </label>
+            <input
+              type="password"
+              className={styles.input}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+            />
+          </div>
+
+          <div className={styles.formRow}>
+            <button
               type="submit"
-              variant="success"
-              className="w-100"
+              className={styles.btnSubmit}
               disabled={loading}
             >
-              {loading ? "Cargando..." : "Iniciar Sesión"}
-            </Button>
-          </Form>
+              {loading ? t("login.submitting") : t("login.submit")}
+            </button>
+          </div>
+        </form>
 
-          <p className="text-center mt-3">
-            ¿No tenés cuenta? <Link to="/register">Registrarse</Link>
-          </p>
-        </Card.Body>
-      </Card>
-    </Container>
+        <div className={styles.dividerText}>o</div>
+        <span>{t("login.noAccount")} </span>
+        <Link to="/register" className={styles.linkSecondary}>
+          {t("login.registerLink")}
+        </Link>
+      </div>
+    </div>
   );
 }

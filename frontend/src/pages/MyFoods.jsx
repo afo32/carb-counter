@@ -1,88 +1,203 @@
 import { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import FoodCard from "../components/FoodCard";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useAuth } from "../context/AuthContext";
 import { usersService, foodsService } from "../services/api";
+import FoodCard from "../components/FoodCard";
+import FoodModal from "../components/FoodModal";
+import styles from "./UserPages.module.css";
 
 export default function MyFoods() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const [foods, setFoods] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [editingFood, setEditingFood] = useState(null);
+
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+    return () => document.head.removeChild(link);
+  }, []);
 
   const load = async () => {
-    const [myFoodsRes, favoritesRes] = await Promise.all([
-      usersService.getMyFoods(),
-      usersService.getFavorites(),
-    ]);
-    setFoods(myFoodsRes.data);
-    setFavoriteIds(new Set(favoritesRes.data.map((f) => f.id)));
-    setLoading(false);
+    try {
+      const [myFoodsRes, favoritesRes] = await Promise.all([
+        usersService.getMyFoods(),
+        usersService.getFavorites(),
+      ]);
+      setFoods(myFoodsRes.data);
+      setFavoriteIds(new Set(favoritesRes.data.map((f) => f.id)));
+    } catch {
+      /* silencioso */
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
 
-  const handleToggleFavorite = async (foodId, shouldAdd) => {
-    if (shouldAdd) {
-      await usersService.addFavorite(foodId);
-      setFavoriteIds((prev) => new Set([...prev, foodId]));
-    } else {
-      await usersService.removeFavorite(foodId);
-      setFavoriteIds((prev) => {
-        const n = new Set(prev);
-        n.delete(foodId);
-        return n;
-      });
+  const handleToggleFavorite = async (foodId, isFav) => {
+    try {
+      if (isFav) {
+        await usersService.removeFavorite(foodId);
+        setFavoriteIds((prev) => {
+          const n = new Set(prev);
+          n.delete(foodId);
+          return n;
+        });
+      } else {
+        await usersService.addFavorite(foodId);
+        setFavoriteIds((prev) => new Set([...prev, foodId]));
+      }
+    } catch {
+      /* silencioso */
     }
   };
 
-  const handleDelete = async (foodId) => {
-    if (!confirm("¿Eliminar este alimento?")) return;
-    await foodsService.delete(foodId);
-    load();
+  const handleEdit = (food) => {
+    setEditingFood(food);
+    setShowModal(true);
+  };
+  const handleDelete = async (food) => {
+    if (!window.confirm(t("myFoods.deleteConfirm", { name: food.name })))
+      return;
+    try {
+      await foodsService.delete(food.id);
+      load();
+    } catch {
+      alert(t("myFoods.deleteError"));
+    }
   };
 
-  return (
-    <Container>
-      <div className="d-flex align-items-center mb-4">
-        <Button
-          variant="outline-secondary"
-          size="sm"
-          className="me-3"
-          onClick={() => navigate(-1)}
-        >
-          ← Volver
-        </Button>
-        <h1 className="mb-0">🥗 Mis Alimentos</h1>
+  if (loading)
+    return (
+      <div className={styles.center}>
+        <span style={{ fontSize: "1.5rem" }}>🥗</span>
+        {t("myFoods.loading")}
       </div>
+    );
 
-      {loading ? (
-        <div className="text-center py-5">
-          <Spinner animation="border" variant="success" />
+  return (
+    <div className={styles.page}>
+      <div className={styles.banner}>
+        <h1 className={styles.bannerTitle}>{t("myFoods.bannerTitle")}</h1>
+        <div className={styles.breadcrumb}>
+          <Link to="/">{t("common.home")}</Link>
+          <span>/</span>
+          <span>{t("myFoods.breadcrumb")}</span>
         </div>
-      ) : foods.length === 0 ? (
-        <div className="text-center py-5">
-          <p className="text-muted fs-5">Todavía no creaste ningún alimento.</p>
-          <Button variant="success" onClick={() => navigate("/foods")}>
-            Ir a agregar uno
-          </Button>
+      </div>
+      <div className={styles.content}>
+        <nav className={styles.sidebar}>
+          <Link to="/profile" className={styles.sidebarItem}>
+            {t("sidebar.myProfile")}
+          </Link>
+          <Link to="/dashboard" className={styles.sidebarItem}>
+            {t("sidebar.myDashboard")}
+          </Link>
+          <Link to="/favorites" className={styles.sidebarItem}>
+            {t("sidebar.favorites")}
+          </Link>
+          <Link
+            to="/my-foods"
+            className={`${styles.sidebarItem} ${styles.sidebarItemActive}`}
+          >
+            {t("sidebar.myFoods")}
+          </Link>
+          <Link to="/diary" className={styles.sidebarItem}>
+            {t("sidebar.diary")}
+          </Link>
+          <div className={styles.sidebarDivider} />
+          <button
+            className={`${styles.sidebarItem} ${styles.sidebarItemDanger}`}
+            onClick={logout}
+          >
+            {t("sidebar.logout")}
+          </button>
+        </nav>
+        <div className={styles.main}>
+          <div className={styles.mainHeader}>
+            <h2 className={styles.mainTitle}>{t("myFoods.title")}</h2>
+            <div
+              style={{
+                display: "flex",
+                gap: "0.75rem",
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              {foods.length > 0 && (
+                <span className={styles.countBadge}>
+                  {t("myFoods.count", { count: foods.length })}
+                </span>
+              )}
+              <button
+                className={styles.btnGreen}
+                onClick={() => {
+                  setEditingFood(null);
+                  setShowModal(true);
+                }}
+              >
+                {t("myFoods.addBtn")}
+              </button>
+            </div>
+          </div>
+          {foods.length === 0 ? (
+            <div className={styles.empty}>
+              <div className={styles.emptyIcon}>🥗</div>
+              <p className={styles.emptyTitle}>{t("myFoods.emptyTitle")}</p>
+              <p className={styles.emptyText}>{t("myFoods.emptyText")}</p>
+              <button
+                className={styles.btnGreen}
+                onClick={() => setShowModal(true)}
+              >
+                {t("myFoods.emptyBtn")}
+              </button>
+            </div>
+          ) : (
+            <div className={styles.grid}>
+              {foods.map((food) => (
+                <FoodCard
+                  key={food.id}
+                  food={food}
+                  isFavorite={favoriteIds.has(food.id)}
+                  onToggleFavorite={handleToggleFavorite}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  userRole={user?.role}
+                  userId={user?.id}
+                  onClick={() => navigate(`/foods/detail/${food.id}`)}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      ) : (
-        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-          {foods.map((food) => (
-            <Col key={food.id}>
-              <FoodCard
-                food={food}
-                onDelete={handleDelete}
-                isFavorite={favoriteIds.has(food.id)}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            </Col>
-          ))}
-        </Row>
+      </div>
+      {showModal && (
+        <FoodModal
+          show={showModal}
+          onHide={() => {
+            setShowModal(false);
+            setEditingFood(null);
+          }}
+          onSuccess={() => {
+            setShowModal(false);
+            setEditingFood(null);
+            load();
+          }}
+          editFood={editingFood}
+        />
       )}
-    </Container>
+    </div>
   );
 }

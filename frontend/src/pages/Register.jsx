@@ -1,20 +1,18 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import {
-  Container,
-  Card,
-  Form,
-  Button,
-  Alert,
-  Row,
-  Col,
-} from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
+import styles from "./Auth.module.css";
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
     username: "",
     first_name: "",
     last_name: "",
@@ -23,18 +21,26 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { register } = useAuth();
-  const navigate = useNavigate();
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+    return () => document.head.removeChild(link);
+  }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (formData.password !== formData.confirmPassword)
+      return setError(t("register.errorPasswordMatch"));
+    if (formData.password.length < 6)
+      return setError(t("register.errorPasswordLength"));
     setLoading(true);
-
     try {
       const userData = await register(
         formData.email,
@@ -44,123 +50,149 @@ export default function Register() {
         formData.last_name,
         formData.country,
       );
-      if (userData.role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/");
-      }
+      navigate(userData.role === "admin" ? "/admin/dashboard" : "/");
     } catch (err) {
-      setError(err.response?.data?.detail || "Error al registrarse");
+      setError(err.response?.data?.detail || t("register.errorDefault"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center py-4"
-      style={{ minHeight: "80vh" }}
-    >
-      <Card style={{ width: "100%", maxWidth: "500px" }}>
-        <Card.Body className="p-4">
-          <h2 className="text-center mb-4">Crear Cuenta</h2>
+    <div className={styles.page}>
+      <div className={styles.banner}>
+        <h1 className={styles.bannerTitle}>{t("register.bannerTitle")}</h1>
+        <div className={styles.breadcrumb}>
+          <Link to="/">{t("common.home")}</Link>
+          <span>/</span>
+          <span>{t("register.breadcrumb")}</span>
+        </div>
+      </div>
 
-          {error && <Alert variant="danger">{error}</Alert>}
+      <div className={styles.content}>
+        <h2 className={styles.sectionTitle}>{t("register.title")}</h2>
 
-          <Form onSubmit={handleSubmit}>
-            <Row>
-              <Col xs={12} sm={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Nombre</Form.Label>
-                  <Form.Control
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    placeholder="Juan"
-                    required
-                  />
-                </Form.Group>
-              </Col>
-              <Col xs={12} sm={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Apellido</Form.Label>
-                  <Form.Control
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    placeholder="García"
-                    required
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
+        {error && <div className={styles.errorAlert}>⚠️ {error}</div>}
 
-            <Form.Group className="mb-3">
-              <Form.Label>Nombre de usuario</Form.Label>
-              <Form.Control
-                name="username"
-                value={formData.username}
+        <form onSubmit={handleSubmit}>
+          <div className={styles.fieldRow}>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>{t("register.firstName")}</label>
+              <input
+                type="text"
+                name="first_name"
+                className={styles.input}
+                value={formData.first_name}
                 onChange={handleChange}
-                placeholder="BestCarbCounter"
-                required
+                placeholder={t("register.firstName")}
               />
-              <Form.Text className="text-muted">
-                Este es el nombre que verán otros usuarios.
-              </Form.Text>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>País</Form.Label>
-              <Form.Control
-                name="country"
-                value={formData.country}
+            </div>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>{t("register.lastName")}</label>
+              <input
+                type="text"
+                name="last_name"
+                className={styles.input}
+                value={formData.last_name}
                 onChange={handleChange}
-                placeholder="España"
-                required
+                placeholder={t("register.lastName")}
               />
-            </Form.Group>
+            </div>
+          </div>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="bestcarbcounter@email.com"
-                required
-              />
-            </Form.Group>
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              {t("register.username")}{" "}
+              <span className={styles.required}>{t("common.required")}</span>
+            </label>
+            <input
+              type="text"
+              name="username"
+              className={styles.input}
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Contraseña</Form.Label>
-              <Form.Control
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              {t("register.email")}{" "}
+              <span className={styles.required}>{t("common.required")}</span>
+            </label>
+            <input
+              type="email"
+              name="email"
+              className={styles.input}
+              value={formData.email}
+              onChange={handleChange}
+              required
+              autoComplete="email"
+            />
+          </div>
+
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>{t("register.country")}</label>
+            <input
+              type="text"
+              name="country"
+              className={styles.input}
+              value={formData.country}
+              onChange={handleChange}
+              placeholder={t("register.countryPlaceholder")}
+            />
+          </div>
+
+          <div className={styles.fieldRow}>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>
+                {t("register.password")}{" "}
+                <span className={styles.required}>{t("common.required")}</span>
+              </label>
+              <input
                 type="password"
                 name="password"
+                className={styles.input}
                 value={formData.password}
                 onChange={handleChange}
-                minLength={6}
-                placeholder="******"
                 required
+                autoComplete="new-password"
               />
-              <Form.Text className="text-muted">Mínimo 6 caracteres.</Form.Text>
-            </Form.Group>
+            </div>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>
+                {t("register.confirmPassword")}{" "}
+                <span className={styles.required}>{t("common.required")}</span>
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                className={styles.input}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
 
-            <Button
+          <div className={styles.formRow}>
+            <button
               type="submit"
-              variant="success"
-              className="w-100 mt-2"
+              className={styles.btnSubmit}
               disabled={loading}
             >
-              {loading ? "Creando cuenta..." : "Registrarse"}
-            </Button>
-          </Form>
+              {loading ? t("register.submitting") : t("register.submit")}
+            </button>
+          </div>
+        </form>
 
-          <p className="text-center mt-3">
-            ¿Ya tenés cuenta? <Link to="/login">Iniciar sesión</Link>
-          </p>
-        </Card.Body>
-      </Card>
-    </Container>
+        <div className={styles.dividerText}>o</div>
+        <span>{t("register.hasAccount")} </span>
+        <Link to="/login" className={styles.linkSecondary}>
+          {t("register.loginLink")}
+        </Link>
+      </div>
+    </div>
   );
 }

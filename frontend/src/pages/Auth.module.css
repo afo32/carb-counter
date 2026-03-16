@@ -1,0 +1,192 @@
+.page {
+  font-family: "Nunito", "Poppins", sans-serif;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+.banner {
+  background: #f7f7f7;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #efefef;
+}
+
+.bannerTitle {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.breadcrumb {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #aaa;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.breadcrumb a {
+  color: #aaa;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+  color: #198754;
+}
+
+.content {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  margin-bottom: 2rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.2rem;
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.required {
+  color: #dc3545;
+  margin-left: 2px;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #198754;
+}
+
+.formRow {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.btnSubmit {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.75rem 2.2rem;
+  border-radius: 4px;
+  border: none;
+  background: #198754;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btnSubmit:hover:not(:disabled) {
+  background: #146c43;
+}
+
+.btnSubmit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.linkSecondary {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #555;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.linkSecondary:hover {
+  color: #198754;
+  text-decoration: underline;
+}
+
+.dividerText {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.8rem 0;
+  color: #aaa;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dividerText::before,
+.dividerText::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #efefef;
+}
+
+.errorAlert {
+  background: #f8d7da;
+  color: #842029;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .fieldRow {
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    padding: 2rem 1.5rem 4rem;
+  }
+}

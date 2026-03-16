@@ -1,0 +1,207 @@
+.page {
+  font-family: "Nunito", "Poppins", sans-serif;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+.banner {
+  background: #f7f7f7;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #efefef;
+}
+
+.bannerTitle {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.breadcrumb {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #aaa;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.breadcrumb a {
+  color: #aaa;
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  color: #198754;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem 1.5rem 4rem;
+  }
+  .banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  position: sticky;
+  top: 90px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #444;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+}
+
+.sidebarItem:hover {
+  background: #f0faf4;
+  color: #198754;
+  text-decoration: none;
+}
+
+.sidebarItemActive {
+  background: #f0faf4;
+  color: #198754;
+}
+
+.sidebarDivider {
+  height: 1px;
+  background: #efefef;
+  margin: 0.4rem 0;
+}
+
+.sidebarItemDanger {
+  color: #dc3545;
+}
+.sidebarItemDanger:hover {
+  background: #fff5f5;
+  color: #dc3545;
+}
+
+.main {
+}
+
+.mainHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.mainTitle {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.countBadge {
+  background: #d1e7dd;
+  color: #146c43;
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.2rem;
+}
+
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6c757d;
+}
+
+.emptyIcon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.emptyTitle {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #1a1a1a;
+  margin-bottom: 0.4rem;
+}
+
+.emptyText {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+.btnGreen {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.88rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.7rem 2rem;
+  border-radius: 4px;
+  border: none;
+  background: #198754;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btnGreen:hover {
+  background: #146c43;
+  color: #fff;
+  text-decoration: none;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: #6c757d;
+  font-weight: 700;
+  gap: 0.75rem;
+}

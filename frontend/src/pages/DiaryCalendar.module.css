@@ -1,0 +1,143 @@
+.calNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.calNavBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #444;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.calNavBtn:hover:not(:disabled) {
+  border-color: #198754;
+  color: #198754;
+  background: #f0faf4;
+}
+
+.calNavBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.calMonthLabel {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calDayHeader {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 0;
+}
+
+.calCell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #444;
+  cursor: default;
+  transition: all 0.15s;
+  position: relative;
+  border: 1.5px solid transparent;
+  gap: 2px;
+}
+
+.calCellEmpty {
+}
+
+.calCellToday {
+  border-color: #198754;
+  color: #198754;
+}
+
+.calCellTodayLabel {
+  font-size: 0.55rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #198754;
+  line-height: 1;
+}
+
+.calCellHasEntries {
+  background: #f0faf4;
+  border-color: #b8dfc9;
+  cursor: pointer;
+  color: #146c43;
+}
+
+.calCellHasEntries:hover {
+  background: #d1e7dd;
+  border-color: #198754;
+  transform: scale(1.05);
+}
+
+.calCellIcon {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #6c757d;
+}
+
+.legendDot {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.legendDotGreen {
+  background: #f0faf4;
+  border: 1.5px solid #b8dfc9;
+}
+
+.legendDotBlue {
+  border: 1.5px solid #198754;
+}

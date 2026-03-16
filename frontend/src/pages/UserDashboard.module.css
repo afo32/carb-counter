@@ -1,0 +1,267 @@
+.page {
+  font-family: "Nunito", "Poppins", sans-serif;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+.banner {
+  background: #f7f7f7;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #efefef;
+}
+
+.bannerTitle {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.breadcrumb {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #aaa;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.breadcrumb a {
+  color: #aaa;
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  color: #198754;
+}
+
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem 1.5rem 4rem;
+  }
+  .banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  position: sticky;
+  top: 90px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #444;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+}
+
+.sidebarItem:hover {
+  background: #f0faf4;
+  color: #198754;
+  text-decoration: none;
+}
+
+.sidebarItemActive {
+  background: #f0faf4;
+  color: #198754;
+}
+
+.sidebarDivider {
+  height: 1px;
+  background: #efefef;
+  margin: 0.4rem 0;
+}
+
+.sidebarItemDanger {
+  color: #dc3545;
+}
+.sidebarItemDanger:hover {
+  background: #fff5f5;
+  color: #dc3545;
+}
+
+.main {
+}
+
+/* Saludo */
+.greeting {
+  margin-bottom: 2.5rem;
+}
+
+.greetingTitle {
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+}
+
+.greetingText {
+  color: #6c757d;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.greetingText a {
+  color: #198754;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.greetingText a:hover {
+  text-decoration: underline;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (max-width: 600px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  border: 1px solid #efefef;
+  border-radius: 12px;
+  padding: 1.4rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  text-decoration: none;
+  cursor: pointer;
+  background: #fff;
+}
+
+.statCard:hover {
+  border-color: #198754;
+  box-shadow: 0 4px 16px rgba(25, 135, 84, 0.1);
+  text-decoration: none;
+}
+
+.statIcon {
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid #efefef;
+}
+
+.quickLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.quickLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+
+.quickLink:hover {
+  background: #f0faf4;
+  border-color: #d1e7dd;
+  color: #198754;
+  text-decoration: none;
+}
+
+.quickLinkLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.quickLinkArrow {
+  color: #aaa;
+  font-size: 0.8rem;
+  transition: transform 0.15s;
+}
+
+.quickLink:hover .quickLinkArrow {
+  transform: translateX(3px);
+  color: #198754;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: #6c757d;
+  font-weight: 700;
+  gap: 0.75rem;
+}

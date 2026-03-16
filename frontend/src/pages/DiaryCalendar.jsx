@@ -1,26 +1,15 @@
 import { useState, useEffect } from "react";
-import { Container, Button, Spinner, Badge } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useAuth } from "../context/AuthContext";
 import { diaryService } from "../services/api";
-
-const MONTHS = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
-];
-const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+import styles from "./UserPages.module.css";
+import cal from "./DiaryCalendar.module.css";
 
 export default function DiaryCalendar() {
+  const { logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const today = new Date();
 
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -28,13 +17,25 @@ export default function DiaryCalendar() {
   const [datesWithEntries, setDatesWithEntries] = useState(new Set());
   const [loading, setLoading] = useState(true);
 
+  const MONTHS = t("diary.months", { returnObjects: true });
+  const DAYS = t("diary.days", { returnObjects: true });
+
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+    return () => document.head.removeChild(link);
+  }, []);
+
   useEffect(() => {
     const load = async () => {
       try {
         const res = await diaryService.getDates();
         setDatesWithEntries(new Set(res.data));
       } catch {
-        // En caso de error, dejamos el set vacío (no se marcará ningún día)
+        /* silencioso */
       } finally {
         setLoading(false);
       }
@@ -55,145 +56,138 @@ export default function DiaryCalendar() {
     } else setViewMonth((m) => m + 1);
   };
 
-  const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
+  const isAtMaxMonth =
+    viewMonth === today.getMonth() && viewYear === today.getFullYear();
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-
   const cells = [
-    ...Array(firstDayOfMonth).fill(null),
+    ...Array(firstDay).fill(null),
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
 
   const formatDate = (day) => {
-    const month = String(viewMonth + 1).padStart(2, "0");
-    const dayStr = String(day).padStart(2, "0");
-    return `${viewYear}-${month}-${dayStr}`;
+    const m = String(viewMonth + 1).padStart(2, "0");
+    const d = String(day).padStart(2, "0");
+    return `${viewYear}-${m}-${d}`;
   };
 
-  const isToday = (day) => {
-    return (
-      day === today.getDate() &&
-      viewMonth === today.getMonth() &&
-      viewYear === today.getFullYear()
-    );
-  };
+  const isToday = (day) =>
+    day === today.getDate() &&
+    viewMonth === today.getMonth() &&
+    viewYear === today.getFullYear();
 
   if (loading)
     return (
-      <Container className="text-center py-5">
-        <Spinner animation="border" variant="success" />
-      </Container>
+      <div className={styles.center}>
+        <span style={{ fontSize: "1.5rem" }}>📅</span>
+        {t("diary.loading")}
+      </div>
     );
 
   return (
-    <Container style={{ maxWidth: "600px" }}>
-      <div className="d-flex align-items-center mb-4">
-        <Button
-          variant="outline-secondary"
-          size="sm"
-          className="me-3"
-          onClick={() => navigate(-1)}
-        >
-          ← Volver
-        </Button>
-        <h1 className="mb-0">📅 Mi Diario</h1>
+    <div className={styles.page}>
+      <div className={styles.banner}>
+        <h1 className={styles.bannerTitle}>{t("diary.bannerTitle")}</h1>
+        <div className={styles.breadcrumb}>
+          <Link to="/">{t("common.home")}</Link>
+          <span>/</span>
+          <span>{t("diary.breadcrumb")}</span>
+        </div>
       </div>
-
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <Button variant="outline-secondary" onClick={prevMonth}>
-          ‹
-        </Button>
-        <h4 className="mb-0 fw-bold">
-          {MONTHS[viewMonth]} {viewYear}
-        </h4>
-        <Button
-          variant="outline-secondary"
-          onClick={nextMonth}
-          disabled={
-            viewMonth === today.getMonth() && viewYear === today.getFullYear()
-          }
-        >
-          ›
-        </Button>
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          gap: "4px",
-        }}
-      >
-        {DAYS.map((day) => (
-          <div
-            key={day}
-            className="text-center text-muted fw-bold py-2"
-            style={{ fontSize: "0.8rem" }}
+      <div className={styles.content}>
+        <nav className={styles.sidebar}>
+          <Link to="/profile" className={styles.sidebarItem}>
+            {t("sidebar.myProfile")}
+          </Link>
+          <Link to="/dashboard" className={styles.sidebarItem}>
+            {t("sidebar.myDashboard")}
+          </Link>
+          <Link to="/favorites" className={styles.sidebarItem}>
+            {t("sidebar.favorites")}
+          </Link>
+          <Link to="/my-foods" className={styles.sidebarItem}>
+            {t("sidebar.myFoods")}
+          </Link>
+          <Link
+            to="/diary"
+            className={`${styles.sidebarItem} ${styles.sidebarItemActive}`}
           >
-            {day}
+            {t("sidebar.diary")}
+          </Link>
+          <div className={styles.sidebarDivider} />
+          <button
+            className={`${styles.sidebarItem} ${styles.sidebarItemDanger}`}
+            onClick={logout}
+          >
+            {t("sidebar.logout")}
+          </button>
+        </nav>
+        <div className={styles.main}>
+          <div className={styles.mainHeader}>
+            <h2 className={styles.mainTitle}>{t("diary.title")}</h2>
+            <span className={styles.countBadge}>
+              {t("diary.daysCount", { count: datesWithEntries.size })}
+            </span>
           </div>
-        ))}
 
-        {cells.map((day, idx) => {
-          if (!day) {
-            return <div key={`empty-${idx}`} />;
-          }
-
-          const dateStr = formatDate(day);
-          const hasEntries = datesWithEntries.has(dateStr);
-          const todayClass = isToday(day);
-
-          return (
-            <div
-              key={dateStr}
-              onClick={() => hasEntries && navigate(`/diary/${dateStr}`)}
-              className={`
-                text-center rounded p-2 position-relative
-                ${hasEntries ? "bg-success bg-opacity-10 border border-success" : ""}
-                ${todayClass ? "fw-bold border border-primary" : ""}
-                ${hasEntries ? "cursor-pointer" : ""}
-              `}
-              style={{
-                cursor: hasEntries ? "pointer" : "default",
-                minHeight: "52px",
-                transition: "background 0.15s",
-              }}
-              onMouseEnter={(e) =>
-                hasEntries &&
-                (e.currentTarget.style.background = "rgba(25,135,84,0.2)")
-              }
-              onMouseLeave={(e) =>
-                hasEntries &&
-                (e.currentTarget.style.background = "rgba(25,135,84,0.1)")
-              }
+          <div className={cal.calNav}>
+            <button className={cal.calNavBtn} onClick={prevMonth}>
+              ‹
+            </button>
+            <span className={cal.calMonthLabel}>
+              {MONTHS[viewMonth]} {viewYear}
+            </span>
+            <button
+              className={cal.calNavBtn}
+              onClick={nextMonth}
+              disabled={isAtMaxMonth}
             >
-              <span style={{ fontSize: "0.9rem" }}>{day}</span>
-              {hasEntries && (
-                <div style={{ fontSize: "1rem", lineHeight: 1 }}>🍴</div>
-              )}
-              {todayClass && !hasEntries && (
-                <div style={{ fontSize: "0.5rem", color: "var(--bs-primary)" }}>
-                  HOY
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+              ›
+            </button>
+          </div>
 
-      <div className="d-flex gap-3 mt-4 justify-content-center">
-        <small className="text-muted d-flex align-items-center gap-1">
-          <span className="bg-success bg-opacity-10 border border-success rounded px-2">
-            🍴
-          </span>
-          Días con registro
-        </small>
-        <small className="text-muted d-flex align-items-center gap-1">
-          <span className="border border-primary rounded px-2 fw-bold">
-            hoy
-          </span>
-          Hoy
-        </small>
+          <div className={cal.calGrid}>
+            {DAYS.map((d) => (
+              <div key={d} className={cal.calDayHeader}>
+                {d}
+              </div>
+            ))}
+            {cells.map((day, idx) => {
+              if (!day)
+                return <div key={`e-${idx}`} className={cal.calCellEmpty} />;
+              const dateStr = formatDate(day);
+              const hasEntries = datesWithEntries.has(dateStr);
+              const todayCell = isToday(day);
+              return (
+                <div
+                  key={dateStr}
+                  className={`${cal.calCell} ${todayCell ? cal.calCellToday : ""} ${hasEntries ? cal.calCellHasEntries : ""}`}
+                  onClick={() => hasEntries && navigate(`/diary/${dateStr}`)}
+                >
+                  <span>{day}</span>
+                  {hasEntries && <span className={cal.calCellIcon}>🍴</span>}
+                  {todayCell && !hasEntries && (
+                    <span className={cal.calCellTodayLabel}>
+                      {t("diary.today")}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className={cal.legend}>
+            <div className={cal.legendItem}>
+              <div className={`${cal.legendDot} ${cal.legendDotGreen}`}>🍴</div>
+              {t("diary.legendEntries")}
+            </div>
+            <div className={cal.legendItem}>
+              <div className={`${cal.legendDot} ${cal.legendDotBlue}`} />
+              {t("diary.legendToday")}
+            </div>
+          </div>
+        </div>
       </div>
-    </Container>
+    </div>
   );
 }

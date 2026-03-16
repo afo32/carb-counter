@@ -1,0 +1,241 @@
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.statCard {
+  border: 1px solid #efefef;
+  border-radius: 12px;
+  padding: 1.4rem 1.2rem;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.statCardGreen {
+  border-color: #b8dfc9;
+  background: #f8fdf9;
+}
+.statCardBlue {
+  border-color: #b6d4fe;
+  background: #f0f6ff;
+}
+
+.statNumber {
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+  letter-spacing: -0.03em;
+}
+
+.statNumberGreen {
+  color: #198754;
+}
+.statNumberBlue {
+  color: #0d6efd;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tableWrap {
+  border: 1px solid #efefef;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tableHeader {
+  background: #f7f7f7;
+  padding: 0.9rem 1.2rem;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  border-bottom: 1px solid #efefef;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead tr {
+  background: #f7f7f7;
+  border-bottom: 1px solid #efefef;
+}
+
+.table thead th {
+  padding: 0.7rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+
+.table thead th.center {
+  text-align: center;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.1s;
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+.table tbody tr:hover {
+  background: #fafafa;
+}
+
+.table td {
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  color: #333;
+  vertical-align: middle;
+}
+
+.table td.center {
+  text-align: center;
+}
+
+.foodCell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.foodImg {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.foodImgPlaceholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f0faf4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.foodName {
+  font-weight: 700;
+  color: #198754;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.foodName:hover {
+  color: #146c43;
+  text-decoration: underline;
+}
+
+.carbsBadge {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.carbsBadgeGreen {
+  background: #d1e7dd;
+  color: #146c43;
+}
+.carbsBadgeRed {
+  background: #f8d7da;
+  color: #842029;
+}
+
+.btnDelete {
+  background: none;
+  border: 1.5px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  color: #dc3545;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.btnDelete:hover {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+}
+
+.tableFoot {
+  background: #f7f7f7;
+  border-top: 2px solid #efefef;
+}
+
+.tableFoot td {
+  padding: 0.85rem 1rem;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.totalLabel {
+  text-align: right;
+  color: #444;
+  font-size: 0.88rem;
+}
+
+.totalValue {
+  text-align: center;
+}
+
+.totalBadge {
+  display: inline-block;
+  background: #198754;
+  color: #fff;
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6c757d;
+  border: 1px solid #efefef;
+  border-radius: 12px;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+.emptyText {
+  font-weight: 700;
+  color: #444;
+}
+
+.errorAlert {
+  background: #f8d7da;
+  color: #842029;
+  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}

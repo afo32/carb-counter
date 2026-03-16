@@ -7,13 +7,29 @@ from typing import Optional
 router = APIRouter(prefix="/users", tags=["Usuarios"])
 
 @router.get("/stats")
-async def get_user_stats(user=Depends(get_current_user)):
-    result = supabase.table("foods")\
+async def get_stats(user=Depends(get_current_user)):
+    user_id = user["user_id"]
+
+    foods_result = supabase.table("foods")\
         .select("id", count="exact")\
-        .eq("created_by", user["user_id"])\
+        .eq("created_by", user_id)\
         .execute()
 
-    return {"foods_created": result.count}
+    favorites_result = supabase.table("favorites")\
+        .select("food_id", count="exact")\
+        .eq("user_id", user_id)\
+        .execute()
+
+    diary_result = supabase.table("diary_entries")\
+        .select("id", count="exact")\
+        .eq("user_id", user_id)\
+        .execute()
+
+    return {
+        "foods":     foods_result.count or 0,
+        "favorites": favorites_result.count or 0,
+        "diary":     diary_result.count or 0,
+    }
 
 @router.get("/favorites")
 async def get_favorites(user=Depends(get_current_user)):

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { foodsService, diaryService, usersService } from "../services/api";
 import styles from "./FoodDetail.module.css";
@@ -8,15 +9,14 @@ export default function FoodDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [food, setFood] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-
   const [grams, setGrams] = useState(100);
-
   const [showModal, setShowModal] = useState(false);
   const [consuming, setConsuming] = useState(false);
 
@@ -38,14 +38,13 @@ export default function FoodDetail() {
       try {
         const foodRes = await foodsService.getById(id);
         setFood(foodRes.data);
-
         const token = localStorage.getItem("token");
         if (token) {
           const favRes = await usersService.getFavorites();
           setIsFavorite(favRes.data.some((f) => f.id === id));
         }
       } catch {
-        setError("No se pudo cargar el alimento.");
+        setError(t("foodDetail.errorLoad"));
       } finally {
         setLoading(false);
       }
@@ -77,19 +76,20 @@ export default function FoodDetail() {
       setSuccessMessage(res.data.message);
       setTimeout(() => setSuccessMessage(""), 4000);
     } catch (err) {
-      setError(err.response?.data?.detail || "Error al registrar");
+      setError(err.response?.data?.detail || t("common.error"));
     } finally {
       setConsuming(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(`¿Eliminar "${food.name}"?`)) return;
+    if (!window.confirm(t("foodDetail.deleteConfirm", { name: food.name })))
+      return;
     try {
       await foodsService.delete(id);
       navigate("/");
     } catch {
-      alert("Error al eliminar");
+      alert(t("common.error"));
     }
   };
 
@@ -101,17 +101,16 @@ export default function FoodDetail() {
     return (
       <div className={styles.center}>
         <span style={{ fontSize: "2.5rem" }}>🌿</span>
-        <span>Cargando alimento...</span>
+        <span>{t("foodDetail.loading")}</span>
       </div>
     );
-
   if (error && !food)
     return (
       <div className={styles.center}>
         <span style={{ fontSize: "2.5rem" }}>⚠️</span>
         <span>{error}</span>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>
-          ← Volver
+          {t("common.back")}
         </button>
       </div>
     );
@@ -120,7 +119,7 @@ export default function FoodDetail() {
     <div className={styles.page}>
       <div className={styles.inner}>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>
-          ← Volver
+          {t("common.back")}
         </button>
 
         {successMessage && (
@@ -145,21 +144,22 @@ export default function FoodDetail() {
 
           <div className={styles.infoCol}>
             <h1 className={styles.foodName}>{food.name}</h1>
-
             {food.is_global && (
-              <span className={styles.globalBadge}>🌐 Alimento global</span>
+              <span className={styles.globalBadge}>
+                {t("foodDetail.globalBadge")}
+              </span>
             )}
 
             <div className={styles.carbsBlock}>
               <div className={styles.carbsNumber}>{food.carbs_per_100g}g</div>
               <div className={styles.carbsUnit}>
-                carbohidratos por cada 100g
+                {t("foodDetail.carbsUnit")}
               </div>
             </div>
 
             <div className={styles.calcBlock}>
               <div className={styles.calcLabel}>
-                🧮 Calculadora de porciones
+                {t("foodDetail.calculator")}
               </div>
               <div className={styles.calcRow}>
                 <div className={styles.calcInputWrap}>
@@ -187,11 +187,11 @@ export default function FoodDetail() {
                     +
                   </button>
                 </div>
-                <span className={styles.calcUnit}>gramos</span>
+                <span className={styles.calcUnit}>{t("common.grams")}</span>
               </div>
               <div className={styles.calcResultRow}>
                 <span className={styles.calcResultLabel}>
-                  Carbohidratos totales
+                  {t("foodDetail.totalCarbs")}
                 </span>
                 <span
                   className={`${styles.calcResultValue} ${calcCarbs > 50 ? styles.calcResultRed : styles.calcResultGreen}`}
@@ -208,13 +208,15 @@ export default function FoodDetail() {
                     className={styles.btnPrimary}
                     onClick={() => setShowModal(true)}
                   >
-                    🍴 Lo consumí hoy ({grams}g)
+                    {t("foodDetail.consumeBtn", { grams })}
                   </button>
                   <button
                     className={`${styles.btnSecondary} ${isFavorite ? styles.btnFavActive : ""}`}
                     onClick={handleToggleFavorite}
                   >
-                    {isFavorite ? "⭐ En favoritos" : "☆ Agregar a favoritos"}
+                    {isFavorite
+                      ? t("foodDetail.favoriteRemove")
+                      : t("foodDetail.favoriteAdd")}
                   </button>
                 </>
               ) : (
@@ -222,20 +224,26 @@ export default function FoodDetail() {
                   className={styles.btnOutlineLogin}
                   onClick={() => navigate("/login")}
                 >
-                  Iniciá sesión para registrar este alimento
+                  {t("foodDetail.loginToConsume")}
                 </button>
               )}
             </div>
 
             <div className={styles.metaBlock}>
               <div className={styles.metaRow}>
-                <span className={styles.metaKey}>Tipo:</span>
+                <span className={styles.metaKey}>
+                  {t("foodDetail.metaType")}
+                </span>
                 <span className={styles.metaVal}>
-                  {food.is_global ? "Alimento global" : "Alimento personal"}
+                  {food.is_global
+                    ? t("foodDetail.typeGlobal")
+                    : t("foodDetail.typePersonal")}
                 </span>
               </div>
               <div className={styles.metaRow}>
-                <span className={styles.metaKey}>Agregado:</span>
+                <span className={styles.metaKey}>
+                  {t("foodDetail.metaAdded")}
+                </span>
                 <span className={styles.metaVal}>
                   {new Date(food.created_at).toLocaleDateString("es-ES", {
                     year: "numeric",
@@ -252,10 +260,10 @@ export default function FoodDetail() {
                   className={styles.btnEdit}
                   onClick={() => navigate(`/foods/edit/${id}`)}
                 >
-                  ✏️ Editar
+                  ✏️ {t("common.edit")}
                 </button>
                 <button className={styles.btnDelete} onClick={handleDelete}>
-                  🗑️ Eliminar
+                  🗑️ {t("common.delete")}
                 </button>
               </div>
             )}
@@ -269,13 +277,16 @@ export default function FoodDetail() {
           onClick={() => setShowModal(false)}
         >
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalTitle}>🍴 Registrar consumo</div>
-            <div className={styles.modalSubtitle}>
-              Vas a registrar <strong>{grams}g</strong> de{" "}
-              <strong>{food.name}</strong> — eso equivale a{" "}
-              <strong>{calcCarbs}g</strong> de carbohidratos.
+            <div className={styles.modalTitle}>
+              {t("foodDetail.modalTitle")}
             </div>
-
+            <div className={styles.modalSubtitle}>
+              {t("foodDetail.modalSubtitle", {
+                grams,
+                name: food.name,
+                carbs: calcCarbs,
+              })}
+            </div>
             <div
               className={styles.calcInputWrap}
               style={{ width: "fit-content", marginBottom: "1rem" }}
@@ -305,10 +316,9 @@ export default function FoodDetail() {
                 +
               </button>
             </div>
-
             <div className={styles.calcResultRow}>
               <span className={styles.calcResultLabel}>
-                Carbohidratos a registrar
+                {t("foodDetail.totalCarbs")}
               </span>
               <span
                 className={`${styles.calcResultValue} ${calcCarbs > 50 ? styles.calcResultRed : styles.calcResultGreen}`}
@@ -316,21 +326,22 @@ export default function FoodDetail() {
                 {calcCarbs}g
               </span>
             </div>
-
             <div className={styles.modalFooter}>
               <button
                 className={styles.btnCancel}
                 onClick={() => setShowModal(false)}
                 disabled={consuming}
               >
-                Cancelar
+                {t("common.cancel")}
               </button>
               <button
                 className={styles.btnConfirm}
                 onClick={handleConsume}
                 disabled={consuming}
               >
-                {consuming ? "Registrando..." : "Confirmar"}
+                {consuming
+                  ? t("foodDetail.confirmConsuming")
+                  : t("common.confirm")}
               </button>
             </div>
           </div>
